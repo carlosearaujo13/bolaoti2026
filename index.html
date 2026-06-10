@@ -385,7 +385,7 @@
 
 <div id="loading-overlay" style="position:fixed; inset:0; background:rgba(255,255,255,0.9); z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:1.5rem; font-weight:700; color:var(--green);">
   <div style="border: 4px solid var(--border); border-top: 4px solid var(--green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom:12px;"></div>
-  Sincronizando com o Google Planilhas...
+  Sincronizando com o Banco de Dados...
 </div>
 
 <header>
@@ -407,7 +407,7 @@
   <div class="score-legend">
     <span class="badge badge-10">✅ 10 pts — Placar Exato</span>
     <span class="badge badge-5">🎯 5 pts — Vencedor/Empate + Saldo</span>
-    <span class="badge badge-3">↕️ 3 pts — Apenas Vencedor/Empate</span>
+    <span class="badge badge-3">↕️ 3 pts — Apenas Vencedor</span>
   </div>
 
   <div id="auth-container" class="card" style="max-width: 420px; margin: 30px auto; display: block;">
@@ -499,12 +499,12 @@
             <td>Você apostou 2x1 e o jogo terminou 2x1.</td>
           </tr>
           <tr>
-            <td><strong>Acerto de Tendência</strong> (Vencedor/Empate)</td>
+            <td><strong>Acerto de Tendência</strong> (Vencedor/Empate e Saldo de Gols)</td>
             <td><span class="badge badge-5">5 pontos</span></td>
-            <td>Você apostou 3x1, o jogo foi 2x0 (Acertou o vencedor e o saldo de +2 gols, mas errou o placar exato).</td>
+            <td>Você apostou 3x1, o jogo foi 2x0 (Acertou o vencedor e o saldo de +2 gols, mas errou o placar exato) ou apostou 1x1, o jogo foi 2x2 (Acertou o empate, mas errou o placar exato).</td>
           </tr>
           <tr>
-            <td><strong>Acerto de Saldo de Gols</strong></td>
+            <td><strong>Acerto de Vencedor</strong></td>
             <td><span class="badge badge-3">3 pontos</span></td>
             <td>Você apostou 2x0, o jogo foi 1x0 (Acertou o vencedor, errou o saldo e placar).</td>
           </tr>
@@ -577,30 +577,30 @@ const ADMIN_PASSWORD = "aperam2026";
 
 const MATCHES = [
   // ── FASE DE GRUPOS ──
-  { id:1,  phase:"grupos", date:"11/06/2026", time:"19:00", group:"A", home:"México",         away:"África do Sul" },
-  { id:2,  phase:"grupos", date:"11/06/2026", time:"22:00", group:"A", home:"Coreia do Sul",  away:"Rep. Tcheca" },
+  { id:1,  phase:"grupos", date:"11/06/2026", time:"16:00", group:"A", home:"México",         away:"África do Sul" },
+  { id:2,  phase:"grupos", date:"11/06/2026", time:"23:00", group:"A", home:"Coreia do Sul",  away:"Rep. Tcheca" },
   { id:3,  phase:"grupos", date:"12/06/2026", time:"16:00", group:"B", home:"Canadá",         away:"Bósnia e Herzegovina" },
   { id:4,  phase:"grupos", date:"12/06/2026", time:"22:00", group:"D", home:"Estados Unidos", away:"Paraguai" },
   { id:5,  phase:"grupos", date:"13/06/2026", time:"16:00", group:"B", home:"Catar",          away:"Suíça" },
   { id:6,  phase:"grupos", date:"13/06/2026", time:"19:00", group:"C", home:"🇧🇷 Brasil",      away:"Marrocos" },
   { id:7,  phase:"grupos", date:"13/06/2026", time:"22:00", group:"C", home:"Haiti",          away:"Escócia" },
-  { id:8,  phase:"grupos", date:"13/06/2026", time:"22:00", group:"D", home:"Austrália",      away:"Turquia" },
-  { id:9,  phase:"grupos", date:"14/06/2026", time:"16:00", group:"E", home:"Alemanha",       away:"Curaçau" },
-  { id:10, phase:"grupos", date:"14/06/2026", time:"19:00", group:"E", home:"Costa do Marfim",away:"Equador" },
-  { id:11, phase:"grupos", date:"14/06/2026", time:"22:00", group:"F", home:"Holanda",        away:"Japão" },
-  { id:12, phase:"grupos", date:"14/06/2026", time:"22:00", group:"F", home:"Suécia",         away:"Tunísia" },
-  { id:13, phase:"grupos", date:"15/06/2026", time:"16:00", group:"H", home:"Espanha",        away:"Cabo Verde" },
+  { id:8,  phase:"grupos", date:"14/06/2026", time:"01:00", group:"D", home:"Austrália",      away:"Turquia" },
+  { id:9,  phase:"grupos", date:"14/06/2026", time:"14:00", group:"E", home:"Alemanha",       away:"Curaçau" },
+  { id:10, phase:"grupos", date:"14/06/2026", time:"20:00", group:"E", home:"Costa do Marfim",away:"Equador" },
+  { id:11, phase:"grupos", date:"14/06/2026", time:"17:00", group:"F", home:"Holanda",        away:"Japão" },
+  { id:12, phase:"grupos", date:"14/06/2026", time:"23:00", group:"F", home:"Suécia",         away:"Tunísia" },
+  { id:13, phase:"grupos", date:"15/06/2026", time:"13:00", group:"H", home:"Espanha",        away:"Cabo Verde" },
   { id:14, phase:"grupos", date:"15/06/2026", time:"19:00", group:"H", home:"Arábia Saudita", away:"Uruguai" },
-  { id:15, phase:"grupos", date:"15/06/2026", time:"22:00", group:"G", home:"Bélgica",        away:"Egito" },
+  { id:15, phase:"grupos", date:"15/06/2026", time:"16:00", group:"G", home:"Bélgica",        away:"Egito" },
   { id:16, phase:"grupos", date:"15/06/2026", time:"22:00", group:"G", home:"Irã",            away:"Nova Zelândia" },
   { id:17, phase:"grupos", date:"16/06/2026", time:"16:00", group:"I", home:"França",         away:"Senegal" },
   { id:18, phase:"grupos", date:"16/06/2026", time:"19:00", group:"I", home:"Iraque",         away:"Noruega" },
   { id:19, phase:"grupos", date:"16/06/2026", time:"22:00", group:"J", home:"Argentina",      away:"Argélia" },
-  { id:20, phase:"grupos", date:"16/06/2026", time:"22:00", group:"J", home:"Áustria",        away:"Jordânia" },
-  { id:21, phase:"grupos", date:"17/06/2026", time:"16:00", group:"K", home:"Portugal",       away:"RD do Congo" },
-  { id:22, phase:"grupos", date:"17/06/2026", time:"19:00", group:"L", home:"Inglaterra",     away:"Croácia" },
-  { id:23, phase:"grupos", date:"17/06/2026", time:"22:00", group:"L", home:"Gana",           away:"Panamá" },
-  { id:24, phase:"grupos", date:"17/06/2026", time:"22:00", group:"K", home:"Uzbequistão",    away:"Colômbia" },
+  { id:20, phase:"grupos", date:"17/06/2026", time:"01:00", group:"J", home:"Áustria",        away:"Jordânia" },
+  { id:21, phase:"grupos", date:"17/06/2026", time:"14:00", group:"K", home:"Portugal",       away:"RD do Congo" },
+  { id:22, phase:"grupos", date:"17/06/2026", time:"17:00", group:"L", home:"Inglaterra",     away:"Croácia" },
+  { id:23, phase:"grupos", date:"17/06/2026", time:"20:00", group:"L", home:"Gana",           away:"Panamá" },
+  { id:24, phase:"grupos", date:"17/06/2026", time:"23:00", group:"K", home:"Uzbequistão",    away:"Colômbia" },
 
   // ── OITAVAS DE FINAL ──
   { id:25, phase:"oitavas", date:"A definir", time:"A definir", group:"Oitavas de Final", home:"A definir", away:"A definir" },
@@ -651,8 +651,8 @@ async function refreshData() {
     let res = await fetch(API_URL);
     CACHE_DATA = await res.json();
   } catch(e) {
-    console.error("Erro ao sincronizar com a planilha:", e);
-    showToast("❌ Erro de conexão com a planilha.");
+    console.error("Erro ao sincronizar com o banco de dados:", e);
+    showToast("❌ Erro de conexão com o banco de dados.");
   }
 }
 
@@ -704,7 +704,7 @@ async function handleRegister() {
       checkAuth();
       showToast(`✅ Perfil cadastrado com sucesso!`);
     } else {
-      msg.textContent = "❌ Erro ao salvar cadastro na planilha.";
+      msg.textContent = "❌ Erro ao salvar cadastro.";
     }
   } catch(e) {
     msg.textContent = "❌ Erro de rede ao cadastrar.";
@@ -938,7 +938,7 @@ async function savePalpites() {
     if(json.status === 'success') {
       await refreshData();
       renderRanking();
-      showToast('✅ Seus palpites foram salvos na planilha!');
+      showToast('✅ Seus palpites foram salvos com sucesso!');
     } else {
       showToast('❌ Erro ao salvar palpites.');
     }
