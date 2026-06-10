@@ -328,7 +328,7 @@
   }
   .chip-done { background: #fee2e2; color: #dc2626; }
   .chip-soon { background: #e0f2fe; color: #0369a1; }
-  .chip-locked { background: #fef08a; color: #a16207; } /* Amarelo para jogos fechados */
+  .chip-locked { background: #fef08a; color: #a16207; }
 
   /* ── MEUS PALPITES VIEW ── */
   .my-result { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
@@ -433,6 +433,17 @@
       <button class="btn-logout" onclick="handleLogout()">Sair da Conta</button>
     </div>
     
+    <div class="user-select-wrap" style="max-width: 280px; margin-bottom: 20px;">
+      <label>📅 Selecione a Etapa da Copa:</label>
+      <select id="sel-etapa" onchange="renderMatches(); loadUserPalpites();">
+        <option value="grupos">Fase de Grupos</option>
+        <option value="oitavas">Oitavas de Final</option>
+        <option value="quartas">Quartas de Final</option>
+        <option value="semi">Semifinais</option>
+        <option value="final">Grande Final</option>
+      </select>
+    </div>
+    
     <div id="matches-container"></div>
     
     <button class="btn-save" onclick="savePalpites()">💾 Salvar Palpites</button>
@@ -512,7 +523,7 @@
     <div class="card-title">📱 Passo a Passo para Operar o Site</div>
     <ul class="regras-list">
       <li><strong>1. Identificação ou Cadastro:</strong> Vá para a aba <strong>🎯 Palpites</strong>. Se for sua primeira vez, digite seu nome e crie uma senha (mínimo de 4 dígitos) e clique em <em>Cadastrar</em>. Se já tiver conta criada, use os mesmos dados e clique em <em>Entrar</em>.</li>
-      <li><strong>2. Lançar os Palpites:</strong> Após o login, os campos de gols dos jogos ativos estarão liberados. Digite o placar que você acredita para cada partida da lista.</li>
+      <li><strong>2. Lançar os Palpites:</strong> Após o login, os campos de gols dos jogos ativos estarão liberados. Digite o placar que você acredita para cada partida da lista. Você pode mudar a etapa no dropbox para ver jogos de mata-mata.</li>
       <li><strong>3. Bloqueio de Horário:</strong> Você só pode salvar ou alterar os palpites de um jogo até o horário oficial do início da partida. Após o horário, os campos são automaticamente bloqueados.</li>
       <li><strong>4. Conferência Individual:</strong> Na aba <strong>📋 Meus Palpites</strong>, selecione seu nome na lista suspensa para ver um relatório limpo e completo de todas as suas apostas feitas, os resultados oficiais já calculados e seus acertos.</li>
       <li><strong>5. Monitorar a Classificação:</strong> Acompanhe a sua evolução na aba <strong>🏆 Ranking</strong>. Ela atualiza de forma automatizada no momento em que a equipe organizadora insere os placares oficiais da rodada!</li>
@@ -535,6 +546,18 @@
   <div id="admin-panel" style="display:none;">
     <div class="card">
       <div class="card-title">⚽ Inserir Resultados Reais</div>
+      
+      <div class="user-select-wrap" style="max-width: 280px; margin-bottom: 15px;">
+        <label>📅 Escolha a Etapa para Lançar:</label>
+        <select id="sel-etapa-admin" onchange="renderAdminMatches()">
+          <option value="grupos">Fase de Grupos</option>
+          <option value="oitavas">Oitavas de Final</option>
+          <option value="quartas">Quartas de Final</option>
+          <option value="semi">Semifinais</option>
+          <option value="final">Grande Final</option>
+        </select>
+      </div>
+
       <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px;">Insira o placar real dos jogos. A pontuação de todos os participantes será calculada automaticamente.</p>
       <div id="admin-matches"></div>
     </div>
@@ -548,39 +571,61 @@
 //  LINK DO BANCO DE DADOS (GOOGLE SHEETS)
 // ════════════════════════════════════════
 
-// COLE A SUA URL AQUI DENTRO DAS ASPAS:
 const API_URL = "https://script.google.com/macros/s/AKfycbwi4kJU3N6nqtOQLDNf7V_fQXhAWE8vPgqxE-ZF5Kjb7CpKlQbwNNJAdpZ_6LWg5nQS/exec"; 
 
 const ADMIN_PASSWORD = "aperam2026"; 
 
 const MATCHES = [
-  { id:1,  date:"11/06/2026", time:"19:00", group:"A", home:"México",         away:"África do Sul" },
-  { id:2,  date:"11/06/2026", time:"22:00", group:"A", home:"Coreia do Sul",  away:"Rep. Tcheca" },
-  { id:3,  date:"12/06/2026", time:"16:00", group:"B", home:"Canadá",         away:"Bósnia e Herzegovina" },
-  { id:4,  date:"12/06/2026", time:"22:00", group:"D", home:"Estados Unidos", away:"Paraguai" },
-  { id:5,  date:"13/06/2026", time:"16:00", group:"B", home:"Catar",          away:"Suíça" },
-  { id:6,  date:"13/06/2026", time:"19:00", group:"C", home:"🇧🇷 Brasil",      away:"Marrocos" },
-  { id:7,  date:"13/06/2026", time:"22:00", group:"C", home:"Haiti",          away:"Escócia" },
-  { id:8,  date:"13/06/2026", time:"22:00", group:"D", home:"Austrália",      away:"Turquia" },
-  { id:9,  date:"14/06/2026", time:"16:00", group:"E", home:"Alemanha",       away:"Curaçau" },
-  { id:10, date:"14/06/2026", time:"19:00", group:"E", home:"Costa do Marfim",away:"Equador" },
-  { id:11, date:"14/06/2026", time:"22:00", group:"F", home:"Holanda",        away:"Japão" },
-  { id:12, date:"14/06/2026", time:"22:00", group:"F", home:"Suécia",         away:"Tunísia" },
-  { id:13, date:"15/06/2026", time:"16:00", group:"H", home:"Espanha",        away:"Cabo Verde" },
-  { id:14, date:"15/06/2026", time:"19:00", group:"H", home:"Arábia Saudita", away:"Uruguai" },
-  { id:15, date:"15/06/2026", time:"22:00", group:"G", home:"Bélgica",        away:"Egito" },
-  { id:16, date:"15/06/2026", time:"22:00", group:"G", home:"Irã",            away:"Nova Zelândia" },
-  { id:17, date:"16/06/2026", time:"16:00", group:"I", home:"França",         away:"Senegal" },
-  { id:18, date:"16/06/2026", time:"19:00", group:"I", home:"Iraque",         away:"Noruega" },
-  { id:19, date:"16/06/2026", time:"22:00", group:"J", home:"Argentina",      away:"Argélia" },
-  { id:20, date:"16/06/2026", time:"22:00", group:"J", home:"Áustria",        away:"Jordânia" },
-  { id:21, date:"17/06/2026", time:"16:00", group:"K", home:"Portugal",       away:"RD do Congo" },
-  { id:22, date:"17/06/2026", time:"19:00", group:"L", home:"Inglaterra",     away:"Croácia" },
-  { id:23, date:"17/06/2026", time:"22:00", group:"L", home:"Gana",           away:"Panamá" },
-  { id:24, date:"17/06/2026", time:"22:00", group:"K", home:"Uzbequistão",    away:"Colômbia" }
+  // ── FASE DE GRUPOS ──
+  { id:1,  phase:"grupos", date:"11/06/2026", time:"19:00", group:"A", home:"México",         away:"África do Sul" },
+  { id:2,  phase:"grupos", date:"11/06/2026", time:"22:00", group:"A", home:"Coreia do Sul",  away:"Rep. Tcheca" },
+  { id:3,  phase:"grupos", date:"12/06/2026", time:"16:00", group:"B", home:"Canadá",         away:"Bósnia e Herzegovina" },
+  { id:4,  phase:"grupos", date:"12/06/2026", time:"22:00", group:"D", home:"Estados Unidos", away:"Paraguai" },
+  { id:5,  phase:"grupos", date:"13/06/2026", time:"16:00", group:"B", home:"Catar",          away:"Suíça" },
+  { id:6,  phase:"grupos", date:"13/06/2026", time:"19:00", group:"C", home:"🇧🇷 Brasil",      away:"Marrocos" },
+  { id:7,  phase:"grupos", date:"13/06/2026", time:"22:00", group:"C", home:"Haiti",          away:"Escócia" },
+  { id:8,  phase:"grupos", date:"13/06/2026", time:"22:00", group:"D", home:"Austrália",      away:"Turquia" },
+  { id:9,  phase:"grupos", date:"14/06/2026", time:"16:00", group:"E", home:"Alemanha",       away:"Curaçau" },
+  { id:10, phase:"grupos", date:"14/06/2026", time:"19:00", group:"E", home:"Costa do Marfim",away:"Equador" },
+  { id:11, phase:"grupos", date:"14/06/2026", time:"22:00", group:"F", home:"Holanda",        away:"Japão" },
+  { id:12, phase:"grupos", date:"14/06/2026", time:"22:00", group:"F", home:"Suécia",         away:"Tunísia" },
+  { id:13, phase:"grupos", date:"15/06/2026", time:"16:00", group:"H", home:"Espanha",        away:"Cabo Verde" },
+  { id:14, phase:"grupos", date:"15/06/2026", time:"19:00", group:"H", home:"Arábia Saudita", away:"Uruguai" },
+  { id:15, phase:"grupos", date:"15/06/2026", time:"22:00", group:"G", home:"Bélgica",        away:"Egito" },
+  { id:16, phase:"grupos", date:"15/06/2026", time:"22:00", group:"G", home:"Irã",            away:"Nova Zelândia" },
+  { id:17, phase:"grupos", date:"16/06/2026", time:"16:00", group:"I", home:"França",         away:"Senegal" },
+  { id:18, phase:"grupos", date:"16/06/2026", time:"19:00", group:"I", home:"Iraque",         away:"Noruega" },
+  { id:19, phase:"grupos", date:"16/06/2026", time:"22:00", group:"J", home:"Argentina",      away:"Argélia" },
+  { id:20, phase:"grupos", date:"16/06/2026", time:"22:00", group:"J", home:"Áustria",        away:"Jordânia" },
+  { id:21, phase:"grupos", date:"17/06/2026", time:"16:00", group:"K", home:"Portugal",       away:"RD do Congo" },
+  { id:22, phase:"grupos", date:"17/06/2026", time:"19:00", group:"L", home:"Inglaterra",     away:"Croácia" },
+  { id:23, phase:"grupos", date:"17/06/2026", time:"22:00", group:"L", home:"Gana",           away:"Panamá" },
+  { id:24, phase:"grupos", date:"17/06/2026", time:"22:00", group:"K", home:"Uzbequistão",    away:"Colômbia" },
+
+  // ── OITAVAS DE FINAL ──
+  { id:25, phase:"oitavas", date:"A definir", time:"A definir", group:"Oitavas de Final", home:"A definir", away:"A definir" },
+  { id:26, phase:"oitavas", date:"A definir", time:"A definir", group:"Oitavas de Final", home:"A definir", away:"A definir" },
+  { id:27, phase:"oitavas", date:"A definir", time:"A definir", group:"Oitavas de Final", home:"A definir", away:"A definir" },
+  { id:28, phase:"oitavas", date:"A definir", time:"A definir", group:"Oitavas de Final", home:"A definir", away:"A definir" },
+  { id:29, phase:"oitavas", date:"A definir", time:"A definir", group:"Oitavas de Final", home:"A definir", away:"A definir" },
+  { id:30, phase:"oitavas", date:"A definir", time:"A definir", group:"Oitavas de Final", home:"A definir", away:"A definir" },
+  { id:31, phase:"oitavas", date:"A definir", time:"A definir", group:"Oitavas de Final", home:"A definir", away:"A definir" },
+  { id:32, phase:"oitavas", date:"A definir", time:"A definir", group:"Oitavas de Final", home:"A definir", away:"A definir" },
+
+  // ── QUARTAS DE FINAL ──
+  { id:33, phase:"quartas", date:"A definir", time:"A definir", group:"Quartas de Final", home:"A definir", away:"A definir" },
+  { id:34, phase:"quartas", date:"A definir", time:"A definir", group:"Quartas de Final", home:"A definir", away:"A definir" },
+  { id:35, phase:"quartas", date:"A definir", time:"A definir", group:"Quartas de Final", home:"A definir", away:"A definir" },
+  { id:36, phase:"quartas", date:"A definir", time:"A definir", group:"Quartas de Final", home:"A definir", away:"A definir" },
+
+  // ── SEMIFINAIS ──
+  { id:37, phase:"semi", date:"A definir", time:"A definir", group:"Semifinais", home:"A definir", away:"A definir" },
+  { id:38, phase:"semi", date:"A definir", time:"A definir", group:"Semifinais", home:"A definir", away:"A definir" },
+
+  // ── FINAL ──
+  { id:39, phase:"final", date:"A definir", time:"A definir", group:"Grande Final", home:"A definir", away:"A definir" }
 ];
 
-// Cache local sincronizado da Nuvem
 let CACHE_DATA = { users: {}, palpites: {}, results: {} };
 
 function getData() { return CACHE_DATA.palpites; }
@@ -625,7 +670,6 @@ function handleLogin() {
   const users = getUsers();
   if (!users[user]) { msg.textContent = "❌ Usuário não cadastrado. Registre-se ao lado."; return; }
   
-  // FIX: Força que ambos sejam tratados como string para evitar erro com números puros
   if (String(users[user]) !== String(pass)) { msg.textContent = "❌ Senha inválida para este usuário."; return; }
   
   setLoggedUser(user);
@@ -713,13 +757,13 @@ function updateUsersDropdown() {
 // ════════════════════════════════════════
 
 function isMatchLocked(dateStr, timeStr) {
-  // Pega a data ("11/06/2026") e hora ("19:00") e converte pra formato de relógio
+  if (!dateStr || !timeStr || dateStr === "A definir" || timeStr === "A definir") return false;
   const dateParts = dateStr.split('/');
   const timeParts = timeStr.split(':');
   
   if (dateParts.length === 3 && timeParts.length === 2) {
     const day = parseInt(dateParts[0], 10);
-    const month = parseInt(dateParts[1], 10) - 1; // Meses no Javascript começam do 0
+    const month = parseInt(dateParts[1], 10) - 1;
     const year = parseInt(dateParts[2], 10);
     const hour = parseInt(timeParts[0], 10);
     const minute = parseInt(timeParts[1], 10);
@@ -727,7 +771,6 @@ function isMatchLocked(dateStr, timeStr) {
     const matchDate = new Date(year, month, day, hour, minute);
     const now = new Date();
     
-    // Se o relógio de agora for maior ou igual a hora do jogo, trava o jogo
     return now >= matchDate;
   }
   return false;
@@ -776,22 +819,32 @@ function calcUserTotal(user) {
 function renderMatches() {
   const container = document.getElementById('matches-container');
   const results = getResults();
-  const uniqueGroups = [...new Set(MATCHES.map(m => m.group))].sort();
+  
+  // Pegar a etapa selecionada no dropdown
+  const selectedPhase = document.getElementById('sel-etapa')?.value || 'grupos';
+  const filteredMatches = MATCHES.filter(m => m.phase === selectedPhase);
+  
+  const uniqueGroups = [...new Set(filteredMatches.map(m => m.group))].sort();
   let html = '';
   
   uniqueGroups.forEach(grp => {
-    html += `<div class="group-container"><div class="group-title-banner">Grupo ${grp}</div>`;
-    const groupMatches = MATCHES.filter(m => m.group === grp);
+    const bannerText = selectedPhase === 'grupos' ? `Grupo ${grp}` : grp;
+    html += `<div class="group-container"><div class="group-title-banner">${bannerText}</div>`;
+    const groupMatches = filteredMatches.filter(m => m.group === grp);
     
     groupMatches.forEach(m => {
       const r = results[m.id];
-      const adminDone = r && r.h !== null && r.h !== undefined; // Se o admin encerrou
-      const timeLocked = isMatchLocked(m.date, m.time); // Se a hora já passou
-      const disabled = adminDone || timeLocked;
+      const adminDone = r && r.h !== null && r.h !== undefined; 
+      const timeLocked = isMatchLocked(m.date, m.time); 
+      const isDefinir = m.home === "A definir" || m.away === "A definir";
+      
+      // Bloqueia campos se o admin fechou, se o tempo esgotou ou se os times ainda não estão definidos
+      const disabled = adminDone || timeLocked || isDefinir;
       
       let chip = '';
       if (adminDone) chip = `<span class="chip chip-done">Encerrado</span>`;
       else if (timeLocked) chip = `<span class="chip chip-locked">Fechado/Em Jogo</span>`;
+      else if (isDefinir) chip = `<span class="chip chip-locked">Aguardando confrontos</span>`;
       else chip = `<span class="chip chip-soon">Aberto</span>`;
         
       html += `
@@ -811,15 +864,20 @@ function renderMatches() {
     });
     html += `</div>`;
   });
-  container.innerHTML = html;
+  container.innerHTML = html || '<p style="text-align:center; color:var(--muted); padding:20px;">Nenhum jogo nesta etapa.</p>';
 }
 
 function updatePtsDisplay(id) {
+  const phEl = document.getElementById(`ph-${id}`);
+  const paEl = document.getElementById(`pa-${id}`);
+  const el = document.getElementById(`pts-${id}`);
+  if (!phEl || !paEl || !el) return;
+
   const results = getResults();
   const r = results[id];
-  const ph = document.getElementById(`ph-${id}`).value;
-  const pa = document.getElementById(`pa-${id}`).value;
-  const el = document.getElementById(`pts-${id}`);
+  const ph = phEl.value;
+  const pa = paEl.value;
+  
   if (!r || r.h === null || r.h === undefined) {
     el.textContent = (ph !== '' && pa !== '') ? `${ph}–${pa}` : '';
     el.className = 'pts-display';
@@ -835,13 +893,15 @@ function loadUserPalpites() {
   if(!user) return;
   const data = getData();
   MATCHES.forEach(m => {
-    const key = `${user}__${m.id}`;
-    const p = data[key];
     const phEl = document.getElementById(`ph-${m.id}`);
     const paEl = document.getElementById(`pa-${m.id}`);
-    if (phEl) phEl.value = (p && p.h !== undefined && p.h !== null) ? p.h : '';
-    if (paEl) paEl.value = (p && p.a !== undefined && p.a !== null) ? p.a : '';
-    updatePtsDisplay(m.id);
+    if (phEl && paEl) {
+      const key = `${user}__${m.id}`;
+      const p = data[key];
+      phEl.value = (p && p.h !== undefined && p.h !== null) ? p.h : '';
+      paEl.value = (p && p.a !== undefined && p.a !== null) ? p.a : '';
+      updatePtsDisplay(m.id);
+    }
   });
 }
 
@@ -853,22 +913,20 @@ async function savePalpites() {
   let guessesToSend = [];
   MATCHES.forEach(m => {
     const r = results[m.id];
-    // Não deixa salvar se o admin já finalizou o jogo...
     if (r && r.h !== null && r.h !== undefined) return; 
-    
-    // ...ou se o horário do jogo já passou!
     if (isMatchLocked(m.date, m.time)) return;
 
     const phEl = document.getElementById(`ph-${m.id}`);
     const paEl = document.getElementById(`pa-${m.id}`);
-    if (!phEl || !paEl) return;
+    if (!phEl || !paEl) return; 
+    
     const ph = phEl.value; const pa = paEl.value;
     if (ph !== '' && pa !== '') {
       guessesToSend.push({ id: m.id, h: parseInt(ph), a: parseInt(pa) });
     }
   });
 
-  if(guessesToSend.length === 0) { showToast('⚠️ Nenhum palpite válido (ou os jogos já fecharam).'); return; }
+  if(guessesToSend.length === 0) { showToast('⚠️ Nenhum palpite válido lançado nesta etapa.'); return; }
 
   showLoading(true);
   try {
@@ -914,7 +972,7 @@ function renderMyPalpites() {
     html += `<div class="my-result">
       <div class="match-info">
         <div style="font-weight:600;font-size:.9rem;">${m.home} × ${m.away}</div>
-        <div style="font-size:.75rem;color:var(--muted);">${m.date} · Grupo ${m.group}</div>
+        <div style="font-size:.75rem;color:var(--muted);">${m.date} · ${m.group}</div>
       </div>
       <div class="my-guess">${hasPalpite ? `${p.h}–${p.a}` : '—'}</div>
       ${hasResult ? `<div class="real-score" style="color:var(--muted);font-size:.85rem;">Real: ${r.h}–${r.a}</div>` : ''}
@@ -928,7 +986,7 @@ function renderMyPalpites() {
 }
 
 // ════════════════════════════════════════
-//  GERAÇÃO DO RANKING (CRITÉRIO DE DESEMPATE ATUALIZADO)
+//  GERAÇÃO DO RANKING
 // ════════════════════════════════════════
 
 function renderRanking() {
@@ -960,7 +1018,7 @@ function renderRanking() {
 }
 
 // ════════════════════════════════════════
-//  GERENCIAMENTO ADMIN (GRAVA NA PLANILHA)
+//  GERENCIAMENTO ADMIN
 // ════════════════════════════════════════
 
 function checkAdmin() {
@@ -977,11 +1035,16 @@ function checkAdmin() {
 function renderAdminMatches() {
   const NavResults = getResults();
   const container = document.getElementById('admin-matches');
-  container.innerHTML = MATCHES.map(m => {
+  
+  // Pegar a etapa selecionada no painel admin
+  const selectedPhase = document.getElementById('sel-etapa-admin')?.value || 'grupos';
+  const filteredMatches = MATCHES.filter(m => m.phase === selectedPhase);
+  
+  container.innerHTML = filteredMatches.map(m => {
     const r = NavResults[m.id] || {};
     const confirmed = (r.h !== undefined && r.h !== null);
     return `<div class="admin-match">
-      <div class="team-label">${m.date} | Grupo ${m.group}</div>
+      <div class="team-label">${m.date} | ${m.group}</div>
       <div style="flex:2;font-weight:600;font-size:.9rem;">${m.home} × ${m.away}</div>
       <input type="number" min="0" max="20" id="adm-h-${m.id}" value="${confirmed?r.h:''}" placeholder="–">
       <span style="font-weight:800;color:var(--muted);">–</span>
@@ -989,7 +1052,7 @@ function renderAdminMatches() {
       <button class="btn-update" onclick="saveResult(${m.id})">Salvar</button>
       ${confirmed ? `<span class="result-confirmed">✔ ${r.h}–${r.a}</span>` : ''}
     </div>`;
-  }).join('');
+  }).join('') || '<p style="text-align:center; color:var(--muted); padding:10px;">Nenhum jogo nesta etapa.</p>';
 }
 
 async function saveResult(id) {
@@ -1025,7 +1088,7 @@ async function saveResult(id) {
 }
 
 // ════════════════════════════════════════
-//  NAVEGAÇÃO DAS ABAS (FORÇA SINCRONIZAÇÃO)
+//  NAVEGAÇÃO DAS ABAS
 // ════════════════════════════════════════
 
 async function showTab(id) {
@@ -1038,7 +1101,6 @@ async function showTab(id) {
     document.querySelectorAll('nav button')[idx].classList.add('active');
   }
   
-  // Ao clicar em Ranking ou Meus Palpites, busca dados novos da planilha automaticamente
   if (id === 'tab-ranking' || id === 'tab-meus') {
     showLoading(true);
     await refreshData();
@@ -1065,7 +1127,7 @@ function showToast(msg) {
 
 async function init() {
   if (API_URL === "SUA_URL_DO_WEB_APP_AQUI") {
-    document.getElementById('loading-overlay').innerHTML = "⚠️ <b>Erro de Configuração:</b> Você precisa colar o link gerado pelo Google Apps Script na variável <code>API_URL</code> dentro do código HTML.";
+    document.getElementById('loading-overlay').innerHTML = "⚠️ <b>Erro de Configuração:</b> Cole o link do script.";
     return;
   }
   showLoading(true);
