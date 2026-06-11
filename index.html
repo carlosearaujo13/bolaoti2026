@@ -72,6 +72,17 @@
   body.dark #loading-overlay { background: rgba(15,23,16,0.95); }
   body.dark .admin-ko-card { background: #1a2a1d; border-color: var(--border); }
   body.dark .admin-ko-card input[type=text] { background: #111e13; }
+  
+  /* --- CORREÇÃO DO FUNDO DOS INPUTS NO MODO ESCURO --- */
+  body.dark .score-inputs input[type=number] {
+    background: #1a2a1d;
+    color: #4ade80; 
+  }
+  body.dark .score-inputs input[type=number]:focus {
+    background: #233626;
+    color: #ffffff;
+  }
+  /* --------------------------------------------------- */
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1357,7 +1368,7 @@
 //  CONFIGURAÇÃO
 // ════════════════════════════════════════
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzZ1jvxpiAhbKhPVzUzNp7yZspmkHI78a0eCIlwKaIaG64PN4mbaFXCqnVdmPmxlf-b/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbxmjMX4j6BxIYRCYOsOQcpDnNOUGp4Mw5uRnIHlSGPaxTWLe9eZWnflFNxSYFNJq88M/exec"; 
 
 // ════════════════════════════════════════
 //  PARTIDAS — FASE DE GRUPOS (fixas no código)
@@ -2430,8 +2441,9 @@ function buildLivePanels() {
   } else {
     leftEl.innerHTML = liveMatches.map(({ m, st }) => {
       const r = results[m.id];
-      const scoreH = (r && r.h !== null && r.h !== undefined) ? r.h : '–';
-      const scoreA = (r && r.a !== null && r.a !== undefined) ? r.a : '–';
+      // ATUALIZAÇÃO: Se for jogo ao vivo, mostrar 0 ao invés de –
+      const scoreH = (r && r.h !== null && r.h !== undefined) ? r.h : '0';
+      const scoreA = (r && r.a !== null && r.a !== undefined) ? r.a : '0';
       const homeClean = m.home.replace('🇧🇷 ', '');
       const awayClean = m.away.replace('🇧🇷 ', '');
       return `<div class="live-card is-live">
