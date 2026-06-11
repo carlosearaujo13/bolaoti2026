@@ -796,6 +796,178 @@
     .etapa-row { max-width: 100%; }
     .admin-ko-grid { grid-template-columns: 1fr 1fr; }
   }
+
+  /* ── MODAL DE PERFIL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 28px 24px 24px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.22);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.4rem; font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--green);
+    margin-bottom: 20px;
+  }
+  .modal-close {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none;
+    font-size: 1.4rem; cursor: pointer;
+    color: var(--muted); line-height: 1;
+    padding: 4px;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-section {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: 16px;
+  }
+  .modal-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .btn-profile {
+    width: 100%; padding: 11px;
+    border: none; border-radius: 9px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase;
+    cursor: pointer; transition: background .2s, transform .1s;
+    margin-top: 8px;
+  }
+  .btn-profile:active { transform: scale(.98); }
+  .btn-profile.green { background: var(--green); color: #fff; }
+  .btn-profile.green:hover { background: var(--green-mid); }
+  .btn-profile.blue  { background: #0369a1; color: #fff; }
+  .btn-profile.blue:hover  { background: #0284c7; }
+  .btn-profile.red   { background: #e11d48; color: #fff; }
+  .btn-profile.red:hover   { background: #be123c; }
+  .profile-msg { font-size: .85rem; font-weight: 600; margin-top: 8px; text-align: center; }
+  .profile-msg.ok  { color: var(--pts10); }
+  .profile-msg.err { color: var(--red-pts); }
+
+  /* ── BOTÃO DE PERFIL NA STATUS BAR ── */
+  .btn-profile-icon {
+    background: var(--green);
+    color: white; border: none;
+    padding: 6px 14px;
+    border-radius: 6px; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; text-transform: uppercase;
+    font-size: .85rem; transition: background .2s;
+    margin-right: 6px;
+  }
+  .btn-profile-icon:hover { background: var(--green-mid); }
+
+  /* ── RESET DE SENHA ── */
+  #reset-section {
+    margin-top: 14px;
+    padding: 14px;
+    background: #fff7ed;
+    border: 1px solid #f97316;
+    border-radius: 10px;
+    display: none;
+  }
+  body.dark #reset-section {
+    background: #2a1a0a;
+    border-color: #c2410c;
+  }
+  #reset-section .reset-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem; font-weight: 800;
+    color: #c2410c; text-transform: uppercase;
+    letter-spacing: .04em; margin-bottom: 10px;
+  }
+
+  /* ── LOG VIEWER ── */
+  .log-entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: .82rem;
+    font-family: monospace;
+    line-height: 1.5;
+  }
+  .log-entry.log-error { border-left: 4px solid #dc2626; }
+  .log-entry.log-warn  { border-left: 4px solid #f59e0b; }
+  .log-entry.log-info  { border-left: 4px solid #2563eb; }
+  .log-time { color: var(--muted); font-size: .78rem; }
+  .log-user { font-weight: 700; color: var(--green); }
+  .log-msg  { margin-top: 3px; color: var(--text); }
+  body.dark .log-entry { background: #111e13; }
+
+  /* ── RESET REQUESTS (ADMIN) ── */
+  .reset-req-card {
+    background: var(--card);
+    border: 1.5px solid #f97316;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .reset-req-info { flex: 1; min-width: 150px; }
+  .reset-req-name { font-weight: 700; font-size: .95rem; color: var(--text); }
+  .reset-req-date { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+  .btn-approve {
+    background: var(--pts10); color: #fff;
+    border: none; padding: 7px 16px; border-radius: 7px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: .85rem; cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-approve:hover { background: #15803d; }
+  .btn-deny {
+    background: #dc2626; color: #fff;
+    border: none; padding: 7px 16px; border-radius: 7px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: .85rem; cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-deny:hover { background: #b91c1c; }
+
+  input[type=email] {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: .95rem;
+    background: #fff;
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+  }
+  input[type=email]:focus { border-color: var(--green); }
+  body.dark input[type=email] {
+    background: #1a2a1d;
+    color: var(--text);
+    border-color: var(--border);
+  }
 </style>
 </head>
 <body>
@@ -844,24 +1016,80 @@
   <div id="auth-container" class="card" style="max-width: 420px; margin: 30px auto; display: block;">
     <div class="card-title">🔐 Identifique-se para palpitar</div>
     <div class="user-select-wrap">
-      <label>👤 Seu Nome Completo / Usuário</label>
-      <input type="text" id="login-user" placeholder="Ex: Nome Sobrenome">
+      <label>👤 Usuário ou E-mail</label>
+      <input type="text" id="login-user" placeholder="Ex: Nome ou Usuário">
     </div>
     <div class="user-select-wrap">
-      <label>🔑 Crie ou digite sua Senha</label>
-      <input type="password" id="login-pass" placeholder="Mínimo 4 dígitos">
+      <label>🔑 Senha</label>
+      <input type="password" id="login-pass" placeholder="Mínimo 4 dígitos" onkeydown="if(event.key==='Enter') handleLogin()">
     </div>
     <div style="display: flex; gap: 10px;">
       <button class="btn-save" style="margin-top:0; flex: 1;" onclick="handleLogin()">🚪 Entrar</button>
-      <button class="btn-save" style="margin-top:0; flex: 1; background: var(--muted);" onclick="handleRegister()">📝 Cadastrar</button>
+      <button class="btn-save" style="margin-top:0; flex: 1; background: var(--muted);" onclick="openRegisterModal()">📝 Cadastrar</button>
     </div>
     <div id="auth-error-msg" style="color: var(--red-pts); font-size: .85rem; font-weight: 600; margin-top: 12px; text-align: center;"></div>
+
+    <div id="reset-section">
+      <div class="reset-title">🔒 Muitas tentativas incorretas</div>
+      <div id="reset-flow-step1">
+        <p style="font-size:.85rem;color:#7c2d12;margin-bottom:10px;">Clique abaixo para redefinir sua senha. Se tiver e-mail cadastrado, você receberá um código. Caso contrário, um pedido será enviado ao admin.</p>
+        <button class="btn-save" style="background:#c2410c;margin-top:0;" onclick="requestPasswordReset()">📧 Redefinir Senha</button>
+      </div>
+      <div id="reset-flow-step2" style="display:none;">
+        <p style="font-size:.85rem;color:#7c2d12;margin-bottom:10px;">Digite o código de 6 dígitos enviado para o seu e-mail:</p>
+        <div class="user-select-wrap" style="margin-bottom:8px;">
+          <input type="text" id="reset-code-input" placeholder="Código de 6 dígitos" maxlength="6">
+        </div>
+        <div class="user-select-wrap" style="margin-bottom:8px;">
+          <input type="password" id="reset-new-pass" placeholder="Nova senha (mín. 4 dígitos)">
+        </div>
+        <div class="user-select-wrap" style="margin-bottom:8px;">
+          <input type="password" id="reset-confirm-pass" placeholder="Confirme a nova senha">
+        </div>
+        <button class="btn-save" style="background:#c2410c;margin-top:0;" onclick="confirmPasswordReset()">✅ Confirmar Redefinição</button>
+      </div>
+      <div id="reset-flow-step3" style="display:none;">
+        <p style="font-size:.85rem;color:#15803d;font-weight:600;">✅ Sua senha foi redefinida com sucesso! Faça login com a nova senha.</p>
+      </div>
+      <div id="reset-flow-pending" style="display:none;">
+        <p style="font-size:.85rem;color:#92400e;font-weight:600;">⏳ Solicitação enviada ao admin. Você será notificado quando aprovado.</p>
+      </div>
+      <div id="reset-msg" style="font-size:.82rem;font-weight:600;margin-top:8px;color:var(--red-pts);"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-register">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('modal-register')">✕</button>
+      <div class="modal-title">📝 Criar Conta</div>
+      <div class="user-select-wrap">
+        <label>👤 Nome / Usuário</label>
+        <input type="text" id="reg-name" placeholder="Ex: João Silva">
+      </div>
+      <div class="user-select-wrap" style="display: none;">
+        <label>📧 E-mail</label>
+        <input type="email" id="reg-email" placeholder="seu@email.com">
+      </div>
+      <div class="user-select-wrap">
+        <label>🔑 Senha</label>
+        <input type="password" id="reg-pass" placeholder="Mínimo 4 dígitos">
+      </div>
+      <div class="user-select-wrap">
+        <label>🔑 Confirmar Senha</label>
+        <input type="password" id="reg-confirm-pass" placeholder="Repita a senha">
+      </div>
+      <button class="btn-profile green" onclick="handleRegister()">✅ Criar Conta</button>
+      <div id="reg-msg" class="profile-msg"></div>
+    </div>
   </div>
 
   <div id="palpites-workspace" class="card" style="display: none;">
     <div class="user-status-bar">
       <span>Usuário: <b id="display-logged-user">--</b></span>
-      <button class="btn-logout" onclick="handleLogout()">Sair da Conta</button>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="btn-profile-icon" onclick="openProfileModal()">👤 Perfil</button>
+        <button class="btn-logout" onclick="handleLogout()">Sair da Conta</button>
+      </div>
     </div>
     
     <div class="etapa-row">
@@ -991,13 +1219,13 @@
 
   <div id="admin-panel" style="display:none;">
     
-    <!-- Sub-abas do Admin -->
     <div class="admin-subtabs">
       <button class="admin-subtab active" onclick="switchAdminTab('resultados')">⚽ Resultados</button>
       <button class="admin-subtab" onclick="switchAdminTab('confrontos')">🗓️ Editar Confrontos Mata-Mata</button>
+      <button class="admin-subtab" onclick="switchAdminTab('resets')">🔑 Pedidos de Reset</button>
+      <button class="admin-subtab" onclick="switchAdminTab('logs')">📋 Logs de Erros</button>
     </div>
 
-    <!-- SUB-ABA: RESULTADOS -->
     <div id="admin-tab-resultados">
       <div class="card">
         <div class="card-title">⚽ Inserir Resultados Reais</div>
@@ -1028,7 +1256,6 @@
       </div>
     </div>
 
-    <!-- SUB-ABA: CONFRONTOS MATA-MATA -->
     <div id="admin-tab-confrontos" style="display:none;">
       <div class="card">
         <div class="card-title">🗓️ Editar Confrontos do Mata-Mata</div>
@@ -1052,26 +1279,96 @@
       </div>
     </div>
 
+    <div id="admin-tab-resets" style="display:none;">
+      <div class="card">
+        <div class="card-title">🔑 Pedidos de Redefinição de Senha</div>
+        <p style="font-size:.85rem; color:var(--muted); margin-bottom:16px; line-height:1.5;">
+          Usuários sem e-mail cadastrado que solicitaram redefinição de senha aparecem aqui. Ao aprovar, o usuário poderá alterar a senha na próxima tentativa de login.
+        </p>
+        <button class="btn-update" onclick="loadResetRequests()" style="margin-bottom:14px;">🔄 Atualizar Lista</button>
+        <div id="admin-reset-requests"><p style="color:var(--muted);text-align:center;padding:10px;">Clique em Atualizar para carregar.</p></div>
+      </div>
+    </div>
+
+    <div id="admin-tab-logs" style="display:none;">
+      <div class="card">
+        <div class="card-title">📋 Logs de Erros</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px;">
+          <button class="btn-update" onclick="loadErrorLogs()">🔄 Atualizar Logs</button>
+          <button class="btn-update" style="background:#0369a1;" onclick="downloadLogs()">⬇️ Baixar .txt</button>
+          <button class="btn-update" style="background:#dc2626;" onclick="clearLogs()">🗑️ Limpar Logs</button>
+        </div>
+        <div id="admin-logs-container"><p style="color:var(--muted);text-align:center;padding:10px;">Clique em Atualizar para carregar.</p></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <div id="toast">✅ Palpites salvos!</div>
 
-  </div><!-- /center-content -->
+<div class="modal-overlay" id="modal-profile">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-profile')">✕</button>
+    <div class="modal-title">👤 Meu Perfil</div>
 
-  <aside class="live-sidebar" id="live-sidebar-right">
+    <div class="modal-section-title" style="margin-bottom:10px;">✏️ Alterar Nome / Usuário</div>
+    <div class="user-select-wrap">
+      <label>Novo nome / usuário</label>
+      <input type="text" id="profile-new-name" placeholder="Novo nome ou usuário">
+    </div>
+    <div class="user-select-wrap">
+      <label>Confirme sua senha atual</label>
+      <input type="password" id="profile-name-pass" placeholder="Senha atual">
+    </div>
+    <button class="btn-profile green" onclick="updateProfileName()">💾 Salvar Nome</button>
+    <div id="profile-name-msg" class="profile-msg"></div>
+
+    <div class="modal-section" style="display: none;">
+      <div class="modal-section-title">📧 Alterar E-mail</div>
+      <div class="user-select-wrap">
+        <label>Novo e-mail</label>
+        <input type="email" id="profile-new-email" placeholder="novo@email.com">
+      </div>
+      <div class="user-select-wrap">
+        <label>Confirme sua senha atual</label>
+        <input type="password" id="profile-email-pass" placeholder="Senha atual">
+      </div>
+      <button class="btn-profile blue" onclick="updateProfileEmail()">💾 Salvar E-mail</button>
+      <div id="profile-email-msg" class="profile-msg"></div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">🔑 Alterar Senha</div>
+      <div class="user-select-wrap">
+        <label>Senha atual</label>
+        <input type="password" id="profile-old-pass" placeholder="Senha atual">
+      </div>
+      <div class="user-select-wrap">
+        <label>Nova senha</label>
+        <input type="password" id="profile-new-pass" placeholder="Mínimo 4 dígitos">
+      </div>
+      <div class="user-select-wrap">
+        <label>Confirmar nova senha</label>
+        <input type="password" id="profile-confirm-pass" placeholder="Repita a nova senha">
+      </div>
+      <button class="btn-profile red" onclick="updateProfilePassword()">🔒 Alterar Senha</button>
+      <div id="profile-pass-msg" class="profile-msg"></div>
+    </div>
+  </div>
+</div>
+
+  </div><aside class="live-sidebar" id="live-sidebar-right">
     <div class="live-sidebar-title">📅 Hoje &amp; Amanhã</div>
     <div id="live-right-content"><div class="live-empty">Carregando...</div></div>
   </aside>
 
-</div><!-- /page-wrapper -->
-
-<script>
+</div><script>
 // ════════════════════════════════════════
 //  CONFIGURAÇÃO
 // ════════════════════════════════════════
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwxN1KdDxL_IZJxOvrY4xApnRHkqpIeXqHKAqOKZy0Vp20G9wZ1XMWUSVfzQ6LyHpbh/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbyaoglqxHcBBCNpXfX4TFw6-TA2__xYStSnviBRgvYc5QNrFH0sUtqFkp_lUyLDU-XR/exec"; 
 const ADMIN_PASSWORD = "aperam2026"; 
 
 // ════════════════════════════════════════
@@ -1178,7 +1475,6 @@ const KO_TEMPLATES = [
   { id:39, phase:"final",   slot:1, label:"Grande Final" },
 ];
 
-// Mescla grupos + mata-mata em MATCHES (mata-mata é preenchido depois com dados da planilha)
 let MATCHES = [...GROUP_MATCHES];
 
 let CACHE_DATA = { users: {}, palpites: {}, results: {}, koMatches: {} };
@@ -1188,7 +1484,6 @@ function getResults() { return CACHE_DATA.results; }
 function getUsers()   { return CACHE_DATA.users; }
 function getKO()      { return CACHE_DATA.koMatches || {}; }
 
-// Reconstrói o array MATCHES com os dados dinâmicos do mata-mata
 function rebuildMatches() {
   const ko = getKO();
   const koArray = KO_TEMPLATES.map(tpl => {
@@ -1231,53 +1526,209 @@ async function refreshData() {
 
 // ════════════════════════════════════════
 //  LÓGICA DE RODADA PADRÃO AUTOMÁTICA
-//  Rodada 1 → após 17/06/2026 23:59 → Rodada 2
-//  Rodada 2 → após 23/06/2026 23:59 → Rodada 3
 // ════════════════════════════════════════
 
 function getDefaultRound() {
   const now = new Date();
-  // Último jogo da Rodada 1: 17/06/2026 23:00 → bloqueia ~110min depois
-  const endRound1 = new Date(2026, 5, 18, 1, 30); // 18/jun 01:30 (110min após 23:00)
-  // Último jogo da Rodada 2: 23/06/2026 23:00
-  const endRound2 = new Date(2026, 6, 24, 1, 30); // 24/jun 01:30
+  const endRound1 = new Date(2026, 5, 18, 1, 30); 
+  const endRound2 = new Date(2026, 6, 24, 1, 30); 
   if (now >= endRound2) return 3;
   if (now >= endRound1) return 2;
   return 1;
 }
 
 // ════════════════════════════════════════
-//  LOGIN
+//  SISTEMA DE LOGS DE ERRO
 // ════════════════════════════════════════
 
-function handleLogin() {
-  const user = document.getElementById('login-user').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  const msg = document.getElementById('auth-error-msg');
-  if (!user || !pass) { msg.textContent = "⚠️ Insira o nome e a senha."; return; }
-  const users = getUsers();
-  if (!users[user]) { msg.textContent = "❌ Usuário não cadastrado. Registre-se ao lado."; return; }
-  if (String(users[user]) !== String(pass)) { msg.textContent = "❌ Senha inválida."; return; }
-  setLoggedUser(user); msg.textContent = ""; checkAuth(); showToast(`👋 Bem-vindo, ${user}!`);
+const ERROR_LOG = [];
+
+function logError(msg, user, level = 'error') {
+  const entry = {
+    ts: new Date().toISOString(),
+    level,
+    user: user || getLoggedUser() || 'anônimo',
+    msg
+  };
+  ERROR_LOG.push(entry);
+  fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'logError', level, user: entry.user, msg, ts: entry.ts })
+  }).catch(() => {});
 }
 
-async function handleRegister() {
-  const user = document.getElementById('login-user').value.trim();
+// ════════════════════════════════════════
+//  LOGIN SEGURO REESCRITO (SEM VALIDAR SENHA LOCALMENTE)
+// ════════════════════════════════════════
+
+let loginAttempts = 0;
+let loginBlockedUser = null;
+
+async function handleLogin() {
+  const identifier = document.getElementById('login-user').value.trim();
   const pass = document.getElementById('login-pass').value;
   const msg = document.getElementById('auth-error-msg');
   
-  if (!user || !pass) { msg.textContent = "⚠️ Insira um nome e senha válidos."; return; }
-  if (user.length < 3) { msg.textContent = "⚠️ O nome deve conter ao menos 3 caracteres."; return; }
-  if (pass.length < 4) { msg.textContent = "⚠️ A senha deve conter ao menos 4 caracteres."; return; }
-  if (getUsers()[user]) { msg.textContent = "❌ Esse nome de usuário já está sendo usado."; return; }
+  if (!identifier || !pass) { 
+    msg.textContent = "⚠️ Insira o usuário e a senha."; 
+    return; 
+  }
+
+  showLoading(true);
+
+  try {
+    let res = await fetch(API_URL, { 
+      method: 'POST', 
+      body: JSON.stringify({ 
+        action: 'login', 
+        identifier: identifier, 
+        pass: pass 
+      }) 
+    });
+    
+    let json = await res.json();
+    
+    if (json.status === 'success') {
+      loginAttempts = 0;
+      loginBlockedUser = null;
+      document.getElementById('reset-section').style.display = 'none';
+      
+      setLoggedUser(json.userName); 
+      msg.textContent = "";
+      checkAuth();
+      showToast(`👋 Bem-vindo, ${json.userName}!`);
+    } else {
+      loginAttempts++;
+      msg.textContent = `❌ ${json.msg || 'Erro ao fazer login'}. Tentativa ${loginAttempts}/3.`;
+      logError(`Login falhou: ${json.msg}`, identifier, 'warn');
+      checkLoginAttempts(identifier);
+    }
+  } catch(e) {
+    msg.textContent = "❌ Erro de conexão com o servidor.";
+    logError(`Erro de rede no login: ${e.message}`, identifier, 'error');
+  }
+  
+  showLoading(false);
+}
+
+function checkLoginAttempts(user) {
+  if (loginAttempts >= 3) {
+    loginBlockedUser = user;
+    document.getElementById('reset-section').style.display = 'block';
+    document.getElementById('reset-flow-step1').style.display = 'block';
+    document.getElementById('reset-flow-step2').style.display = 'none';
+    document.getElementById('reset-flow-step3').style.display = 'none';
+    document.getElementById('reset-flow-pending').style.display = 'none';
+    document.getElementById('reset-msg').textContent = '';
+  }
+}
+
+async function requestPasswordReset() {
+  const user = loginBlockedUser || document.getElementById('login-user').value.trim();
+  if (!user) { document.getElementById('reset-msg').textContent = "⚠️ Informe o usuário no campo acima."; return; }
   
   showLoading(true);
   try {
-    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'register', name: user, pass: pass }) });
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'requestPasswordReset', user }) });
     let json = await res.json();
-    if(json.status === 'success') { await refreshData(); setLoggedUser(user); msg.textContent = ""; checkAuth(); showToast(`✅ Perfil cadastrado com sucesso!`); }
-    else { msg.textContent = "❌ Erro ao salvar cadastro."; }
-  } catch(e) { msg.textContent = "❌ Erro de rede ao cadastrar."; }
+    if (json.status === 'success') {
+      if (json.hasEmail) {
+        document.getElementById('reset-flow-step1').style.display = 'none';
+        document.getElementById('reset-flow-step2').style.display = 'block';
+        document.getElementById('reset-msg').textContent = '';
+      } else {
+        document.getElementById('reset-flow-step1').style.display = 'none';
+        document.getElementById('reset-flow-pending').style.display = 'block';
+        document.getElementById('reset-msg').textContent = '';
+      }
+    } else {
+      document.getElementById('reset-msg').textContent = '❌ Erro: ' + (json.msg || 'Tente novamente.');
+      logError(`Falha ao solicitar reset para ${user}: ${json.msg}`, user);
+    }
+  } catch(e) {
+    document.getElementById('reset-msg').textContent = '❌ Erro de conexão.';
+    logError(`Erro de rede ao solicitar reset para ${user}: ${e.message}`, user);
+  }
+  showLoading(false);
+}
+
+async function confirmPasswordReset() {
+  const user = loginBlockedUser;
+  const code = document.getElementById('reset-code-input').value.trim();
+  const newPass = document.getElementById('reset-new-pass').value;
+  const confirmPass = document.getElementById('reset-confirm-pass').value;
+  const resetMsg = document.getElementById('reset-msg');
+
+  if (!code || code.length !== 6) { resetMsg.textContent = '⚠️ Digite o código de 6 dígitos.'; return; }
+  if (!newPass || newPass.length < 4) { resetMsg.textContent = '⚠️ Nova senha deve ter ao menos 4 dígitos.'; return; }
+  if (newPass !== confirmPass) { resetMsg.textContent = '⚠️ As senhas não coincidem.'; return; }
+
+  showLoading(true);
+  try {
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'confirmPasswordReset', user, code, newPass }) });
+    let json = await res.json();
+    if (json.status === 'success') {
+      await refreshData();
+      loginAttempts = 0;
+      loginBlockedUser = null;
+      document.getElementById('reset-flow-step2').style.display = 'none';
+      document.getElementById('reset-flow-step3').style.display = 'block';
+      resetMsg.textContent = '';
+      setTimeout(() => { document.getElementById('reset-section').style.display = 'none'; }, 3000);
+    } else {
+      resetMsg.textContent = '❌ ' + (json.msg || 'Código inválido ou expirado.');
+      logError(`Falha na confirmação de reset para ${user}: ${json.msg}`, user);
+    }
+  } catch(e) {
+    resetMsg.textContent = '❌ Erro de conexão.';
+    logError(`Erro de rede na confirmação de reset: ${e.message}`, user);
+  }
+  showLoading(false);
+}
+
+function openRegisterModal() {
+  document.getElementById('reg-name').value = '';
+  document.getElementById('reg-email').value = '';
+  document.getElementById('reg-pass').value = '';
+  document.getElementById('reg-confirm-pass').value = '';
+  document.getElementById('reg-msg').textContent = '';
+  document.getElementById('reg-msg').className = 'profile-msg';
+  document.getElementById('modal-register').classList.add('open');
+}
+
+async function handleRegister() {
+  const user = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim(); // Estará vazio pois foi ocultado
+  const pass = document.getElementById('reg-pass').value;
+  const confirm = document.getElementById('reg-confirm-pass').value;
+  const msg = document.getElementById('reg-msg');
+  
+  if (!user || !pass) { msg.textContent = "⚠️ Preencha nome e senha."; msg.className = 'profile-msg err'; return; }
+  if (user.length < 3) { msg.textContent = "⚠️ O nome deve conter ao menos 3 caracteres."; msg.className = 'profile-msg err'; return; }
+  if (pass.length < 4) { msg.textContent = "⚠️ A senha deve conter ao menos 4 dígitos."; msg.className = 'profile-msg err'; return; }
+  if (pass !== confirm) { msg.textContent = "⚠️ As senhas não coincidem."; msg.className = 'profile-msg err'; return; }
+  if (getUsers()[user]) { msg.textContent = "❌ Esse nome já está em uso."; msg.className = 'profile-msg err'; return; }
+  
+  showLoading(true);
+  try {
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'register', name: user, pass, email }) });
+    let json = await res.json();
+    if(json.status === 'success') {
+      await refreshData();
+      setLoggedUser(user);
+      closeModal('modal-register');
+      checkAuth();
+      showToast(`✅ Perfil cadastrado com sucesso!`);
+    } else {
+      msg.textContent = "❌ " + (json.msg || "Erro ao salvar cadastro.");
+      msg.className = 'profile-msg err';
+      logError(`Falha no cadastro de ${user}: ${json.msg}`, user);
+    }
+  } catch(e) {
+    msg.textContent = "❌ Erro de rede ao cadastrar.";
+    msg.className = 'profile-msg err';
+    logError(`Erro de rede no cadastro de ${user}: ${e.message}`, user);
+  }
   showLoading(false);
 }
 
@@ -1294,8 +1745,128 @@ function checkAuth() {
     renderMatches(); loadUserPalpites();
   } else {
     document.getElementById('login-user').value = ''; document.getElementById('login-pass').value = '';
+    document.getElementById('reset-section').style.display = 'none';
+    loginAttempts = 0;
   }
   updateUsersDropdown();
+}
+
+// ════════════════════════════════════════
+//  PERFIL DE USUÁRIO (REESCRITO COM VALIDAÇÃO BACKEND)
+// ════════════════════════════════════════
+
+function openProfileModal() {
+  const user = getLoggedUser(); if (!user) return;
+  document.getElementById('profile-new-name').value = '';
+  document.getElementById('profile-name-pass').value = '';
+  document.getElementById('profile-new-email').value = '';
+  document.getElementById('profile-email-pass').value = '';
+  document.getElementById('profile-old-pass').value = '';
+  document.getElementById('profile-new-pass').value = '';
+  document.getElementById('profile-confirm-pass').value = '';
+  ['profile-name-msg','profile-email-msg','profile-pass-msg'].forEach(id => {
+    document.getElementById(id).textContent = '';
+    document.getElementById(id).className = 'profile-msg';
+  });
+  document.getElementById('modal-profile').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+async function updateProfileName() {
+  const user = getLoggedUser();
+  const newName = document.getElementById('profile-new-name').value.trim();
+  const pass = document.getElementById('profile-name-pass').value;
+  const msgEl = document.getElementById('profile-name-msg');
+
+  if (!newName) { msgEl.textContent = '⚠️ Digite o novo nome.'; msgEl.className = 'profile-msg err'; return; }
+  if (newName.length < 3) { msgEl.textContent = '⚠️ Nome muito curto (mín. 3 caracteres).'; msgEl.className = 'profile-msg err'; return; }
+  if (!pass) { msgEl.textContent = '⚠️ Confirme sua senha.'; msgEl.className = 'profile-msg err'; return; }
+  
+  showLoading(true);
+  try {
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateProfile', user, field: 'name', value: newName, pass }) });
+    let json = await res.json();
+    if (json.status === 'success') {
+      await refreshData();
+      setLoggedUser(newName);
+      document.getElementById('display-logged-user').textContent = newName;
+      msgEl.textContent = '✅ Nome atualizado com sucesso!'; msgEl.className = 'profile-msg ok';
+      document.getElementById('profile-new-name').value = '';
+      document.getElementById('profile-name-pass').value = '';
+    } else {
+      msgEl.textContent = '❌ ' + (json.msg || 'Erro ao atualizar.'); msgEl.className = 'profile-msg err';
+      logError(`Falha ao atualizar nome de ${user}: ${json.msg}`, user);
+    }
+  } catch(e) {
+    msgEl.textContent = '❌ Erro de conexão.'; msgEl.className = 'profile-msg err';
+    logError(`Erro de rede ao atualizar nome de ${user}: ${e.message}`, user);
+  }
+  showLoading(false);
+}
+
+async function updateProfileEmail() {
+  const user = getLoggedUser();
+  const newEmail = document.getElementById('profile-new-email').value.trim();
+  const pass = document.getElementById('profile-email-pass').value;
+  const msgEl = document.getElementById('profile-email-msg');
+
+  if (!newEmail) { msgEl.textContent = '⚠️ Digite o novo e-mail.'; msgEl.className = 'profile-msg err'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { msgEl.textContent = '⚠️ E-mail inválido.'; msgEl.className = 'profile-msg err'; return; }
+  if (!pass) { msgEl.textContent = '⚠️ Confirme sua senha.'; msgEl.className = 'profile-msg err'; return; }
+
+  showLoading(true);
+  try {
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateProfile', user, field: 'email', value: newEmail, pass }) });
+    let json = await res.json();
+    if (json.status === 'success') {
+      await refreshData();
+      msgEl.textContent = '✅ E-mail atualizado!'; msgEl.className = 'profile-msg ok';
+      document.getElementById('profile-new-email').value = '';
+      document.getElementById('profile-email-pass').value = '';
+    } else {
+      msgEl.textContent = '❌ ' + (json.msg || 'Erro ao atualizar.'); msgEl.className = 'profile-msg err';
+      logError(`Falha ao atualizar email de ${user}: ${json.msg}`, user);
+    }
+  } catch(e) {
+    msgEl.textContent = '❌ Erro de conexão.'; msgEl.className = 'profile-msg err';
+    logError(`Erro de rede ao atualizar email de ${user}: ${e.message}`, user);
+  }
+  showLoading(false);
+}
+
+async function updateProfilePassword() {
+  const user = getLoggedUser();
+  const oldPass = document.getElementById('profile-old-pass').value;
+  const newPass = document.getElementById('profile-new-pass').value;
+  const confirmPass = document.getElementById('profile-confirm-pass').value;
+  const msgEl = document.getElementById('profile-pass-msg');
+
+  if (!oldPass) { msgEl.textContent = '⚠️ Digite sua senha atual.'; msgEl.className = 'profile-msg err'; return; }
+  if (!newPass || newPass.length < 4) { msgEl.textContent = '⚠️ Nova senha deve ter ao menos 4 dígitos.'; msgEl.className = 'profile-msg err'; return; }
+  if (newPass !== confirmPass) { msgEl.textContent = '⚠️ As senhas não coincidem.'; msgEl.className = 'profile-msg err'; return; }
+
+  showLoading(true);
+  try {
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateProfile', user, field: 'pass', value: newPass, pass: oldPass }) });
+    let json = await res.json();
+    if (json.status === 'success') {
+      await refreshData();
+      msgEl.textContent = '✅ Senha alterada com sucesso!'; msgEl.className = 'profile-msg ok';
+      document.getElementById('profile-old-pass').value = '';
+      document.getElementById('profile-new-pass').value = '';
+      document.getElementById('profile-confirm-pass').value = '';
+    } else {
+      msgEl.textContent = '❌ ' + (json.msg || 'Erro ao alterar senha.'); msgEl.className = 'profile-msg err';
+      logError(`Falha ao alterar senha de ${user}: ${json.msg}`, user);
+    }
+  } catch(e) {
+    msgEl.textContent = '❌ Erro de conexão.'; msgEl.className = 'profile-msg err';
+    logError(`Erro de rede ao alterar senha de ${user}: ${e.message}`, user);
+  }
+  showLoading(false);
 }
 
 function updateUsersDropdown() {
@@ -1432,7 +2003,6 @@ function renderMatches() {
     html += `<div class="group-container">`;
     
     if (selectedPhase === 'grupos') {
-      // ── Calcula a rodada padrão ──
       const defaultRound = getDefaultRound();
       
       html += `
@@ -1601,8 +2171,15 @@ function checkAdmin() {
 function switchAdminTab(tab) {
   document.getElementById('admin-tab-resultados').style.display  = tab === 'resultados'  ? 'block' : 'none';
   document.getElementById('admin-tab-confrontos').style.display  = tab === 'confrontos' ? 'block' : 'none';
+  document.getElementById('admin-tab-resets').style.display  = tab === 'resets' ? 'block' : 'none';
+  document.getElementById('admin-tab-logs').style.display  = tab === 'logs' ? 'block' : 'none';
   document.querySelectorAll('.admin-subtab').forEach((btn, i) => {
-    btn.classList.toggle('active', (i === 0 && tab === 'resultados') || (i === 1 && tab === 'confrontos'));
+    btn.classList.toggle('active', 
+      (i === 0 && tab === 'resultados') || 
+      (i === 1 && tab === 'confrontos') ||
+      (i === 2 && tab === 'resets') ||
+      (i === 3 && tab === 'logs')
+    );
   });
 }
 
@@ -1935,6 +2512,104 @@ function startLiveUpdates() {
       }
     });
   }, 1000);
+}
+
+// ════════════════════════════════════════
+//  FUNÇÕES DO PAINEL ADMIN FALTANTES
+// ════════════════════════════════════════
+
+async function loadResetRequests() {
+  const container = document.getElementById('admin-reset-requests');
+  container.innerHTML = '<p style="text-align:center;color:var(--muted);">Carregando...</p>';
+  try {
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getResetRequests' }) });
+    let json = await res.json();
+    if (json.data && json.data.length > 0) {
+      container.innerHTML = json.data.map(r => `
+        <div class="reset-req-card">
+          <div class="reset-req-info">
+            <div class="reset-req-name">${r.user}</div>
+            <div class="reset-req-date">${new Date(r.date).toLocaleString()}</div>
+          </div>
+          <button class="btn-approve" onclick="approveReset('${r.user}')">Aprovar (Senha: 1234)</button>
+          <button class="btn-deny" onclick="denyReset('${r.user}')">Rejeitar</button>
+        </div>
+      `).join('');
+    } else {
+      container.innerHTML = '<p style="text-align:center;color:var(--muted);">Nenhum pedido pendente.</p>';
+    }
+  } catch(e) {
+    container.innerHTML = '<p style="text-align:center;color:var(--red-pts);">Erro ao carregar os pedidos.</p>';
+  }
+}
+
+async function approveReset(user) {
+  if(!confirm(`Isso redefinirá a senha de ${user} para "1234". Continuar?`)) return;
+  showLoading(true);
+  try {
+    await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'approveReset', user: user }) });
+    showToast('✅ Senha redefinida para 1234!');
+    loadResetRequests();
+  } catch(e) { showToast('❌ Erro de conexão.'); }
+  showLoading(false);
+}
+
+async function denyReset(user) {
+  if(!confirm(`Rejeitar pedido de ${user}?`)) return;
+  showLoading(true);
+  try {
+    await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'denyReset', user: user }) });
+    showToast('✅ Pedido rejeitado.');
+    loadResetRequests();
+  } catch(e) { showToast('❌ Erro de conexão.'); }
+  showLoading(false);
+}
+
+async function loadErrorLogs() {
+  const container = document.getElementById('admin-logs-container');
+  container.innerHTML = '<p style="text-align:center;color:var(--muted);">Carregando logs...</p>';
+  try {
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminLogs' }) });
+    let json = await res.json();
+    if (json.data && json.data.length > 0) {
+      container.innerHTML = json.data.map(l => `
+        <div class="log-entry log-${l.level || 'info'}">
+          <span class="log-time">[${new Date(l.date).toLocaleString()}]</span> 
+          <span class="log-user">${l.user}</span>
+          <div class="log-msg">${l.msg}</div>
+        </div>
+      `).join('');
+    } else {
+      container.innerHTML = '<p style="text-align:center;color:var(--muted);">Nenhum log registrado.</p>';
+    }
+  } catch(e) {
+    container.innerHTML = '<p style="text-align:center;color:var(--red-pts);">Erro ao carregar logs.</p>';
+  }
+}
+
+async function clearLogs() {
+  if(!confirm("Tem certeza que deseja limpar todos os logs?")) return;
+  showLoading(true);
+  try {
+    await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'clearAdminLogs' }) });
+    showToast('✅ Logs limpos com sucesso.');
+    loadErrorLogs();
+  } catch(e) { showToast('❌ Erro de conexão.'); }
+  showLoading(false);
+}
+
+function downloadLogs() {
+  const entries = document.querySelectorAll('.log-entry');
+  if(entries.length === 0) { showToast('⚠️ Sem logs para baixar.'); return; }
+  let txt = "--- LOGS BOLÃO TI APERAM ---\n\n";
+  entries.forEach(e => { txt += e.innerText + "\n\n"; });
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `logs_bolao_${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+  window.URL.revokeObjectURL(url);
 }
 
 window.addEventListener('load', () => {
