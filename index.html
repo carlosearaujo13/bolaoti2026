@@ -23,7 +23,55 @@
     --pts10: #16a34a;
     --pts5: #2563eb;
     --pts3: #d97706;
+    /* countdown */
+    --urgent-bg: #fff7ed;
+    --urgent-border: #f97316;
+    --urgent-text: #c2410c;
+    --soon-bg: #fffbeb;
+    --soon-border: #facc15;
+    --soon-text: #92400e;
   }
+
+  /* ── DARK MODE ── */
+  body.dark {
+    --surface: #0f1710;
+    --card: #1a2a1d;
+    --text: #e8f0e9;
+    --muted: #7aaa82;
+    --border: #2a3d2d;
+    --pitch: #0d2414;
+    --dark: #060e08;
+    --pts10: #4ade80;
+    --pts5: #60a5fa;
+    --pts3: #fbbf24;
+    --urgent-bg: #2a1a0a;
+    --urgent-border: #c2410c;
+    --urgent-text: #fb923c;
+    --soon-bg: #1f1a07;
+    --soon-border: #a16207;
+    --soon-text: #fcd34d;
+  }
+  body.dark select,
+  body.dark input[type=text],
+  body.dark input[type=password],
+  body.dark input[type=number] {
+    background: #1a2a1d;
+    color: var(--text);
+    border-color: var(--border);
+  }
+  body.dark .admin-match input[type=number] { background: #1a2a1d; }
+  body.dark .search-box input { background: #1a2a1d; color: var(--text); }
+  body.dark .group-container { background: #141f16; }
+  body.dark .match-card { background: #1a2a1d; }
+  body.dark tr:hover td { background: #1f2f21; }
+  body.dark .user-status-bar { background: #162318; }
+  body.dark .live-card { background: #1a2a1d; }
+  body.dark .live-card.is-live { background: #2a1217; }
+  body.dark .live-card.is-soon { background: #101e2a; }
+  body.dark .match-urgency { background: var(--urgent-bg) !important; border-color: var(--urgent-border) !important; }
+  body.dark .match-urgency .countdown-bar { background: #2a1505 !important; }
+  body.dark .match-soon-warn { background: var(--soon-bg) !important; border-color: var(--soon-border) !important; }
+  body.dark #loading-overlay { background: rgba(15,23,16,0.95); }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -127,7 +175,7 @@
   }
 
   /* ── SCORING LEGEND ── */
-  .score-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+  .score-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; justify-content: center; }
   .badge {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 5px 12px; border-radius: 20px;
@@ -329,6 +377,112 @@
   .chip-done { background: #fee2e2; color: #dc2626; }
   .chip-soon { background: #e0f2fe; color: #0369a1; }
   .chip-locked { background: #fef08a; color: #a16207; }
+  .chip-live {
+    background: #fee2e2;
+    color: #dc2626;
+    animation: chipPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes chipPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .55; }
+  }
+
+  /* ── DARK MODE TOGGLE (botão no header) ── */
+  .dark-toggle {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: rgba(255,255,255,.12);
+    border: 1.5px solid rgba(255,255,255,.2);
+    border-radius: 30px;
+    padding: 6px 14px 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    color: rgba(255,255,255,.85);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .85rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    transition: background .2s, border-color .2s;
+    z-index: 10;
+    user-select: none;
+  }
+  .dark-toggle:hover { background: rgba(255,255,255,.22); }
+  .dark-toggle .toggle-track {
+    width: 34px; height: 18px;
+    background: rgba(255,255,255,.25);
+    border-radius: 9px;
+    position: relative;
+    transition: background .3s;
+    flex-shrink: 0;
+  }
+  .dark-toggle .toggle-thumb {
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px; left: 2px;
+    transition: transform .3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  }
+  body.dark .dark-toggle .toggle-track { background: var(--gold); }
+  body.dark .dark-toggle .toggle-thumb { transform: translateX(16px); }
+
+  /* ── COUNTDOWN / URGÊNCIA NOS CARDS ── */
+  .match-urgency {
+    border-color: #f97316 !important;
+    border-width: 2px !important;
+  }
+  .match-urgency .match-header { background: #9a3412; }
+  .match-soon-warn {
+    border-color: #facc15 !important;
+    border-width: 2px !important;
+  }
+  .match-soon-warn .match-header { background: #78350f; }
+
+  .match-countdown {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 16px 7px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .match-urgency .match-countdown { background: var(--urgent-bg, #fff7ed); }
+  .match-soon-warn .match-countdown { background: var(--soon-bg, #fffbeb); }
+
+  .cd-label { display: flex; align-items: center; gap: 5px; }
+  .match-urgency .cd-label,
+  .match-urgency .cd-timer { color: var(--urgent-text, #c2410c); }
+  .match-soon-warn .cd-label,
+  .match-soon-warn .cd-timer { color: var(--soon-text, #92400e); }
+
+  .cd-timer {
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown-bar {
+    height: 3px;
+    margin: 0 0 0;
+    overflow: hidden;
+  }
+  .match-urgency .countdown-bar { background: #fed7aa; }
+  .match-soon-warn .countdown-bar { background: #fef08a; }
+  .countdown-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s linear;
+  }
+  .match-urgency .countdown-bar-fill { background: #f97316; }
+  .match-soon-warn .countdown-bar-fill { background: #eab308; }
 
   /* ── MEUS PALPITES VIEW ── */
   .my-result { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
@@ -346,7 +500,7 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 1.4rem; font-weight: 900;
     text-transform: uppercase; letter-spacing: .06em;
-    color: var(--dark); margin-bottom: 16px;
+    color: var(--text); margin-bottom: 16px;
     display: flex; align-items: center; gap: 10px;
   }
   .sec-title::after {
@@ -374,10 +528,174 @@
 
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+  /* ── LAYOUT GERAL COM COLUNAS LATERAIS ── */
+  .page-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    max-width: 1380px;
+    margin: 0 auto;
+  }
+
+  /* ── SIDEBAR AO VIVO ── */
+  .live-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 12px;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .live-sidebar-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .9rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--border);
+  }
+  .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #e11d48;
+    animation: pulseLive 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulseLive {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: .4; transform: scale(.7); }
+  }
+  .live-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.07);
+    font-size: .8rem;
+  }
+  .live-card.is-live {
+    border-color: #e11d48;
+    background: #fff5f7;
+  }
+  .live-card.is-soon {
+    border-color: #0369a1;
+    background: #f0f9ff;
+  }
+  .live-card .lc-teams {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .live-card .lc-team { flex: 1; line-height: 1.2; }
+  .live-card .lc-team.home { text-align: right; }
+  .live-card .lc-team.away { text-align: left; }
+  .live-card .lc-score {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--dark);
+    text-align: center;
+    min-width: 52px;
+    background: var(--surface);
+    border-radius: 6px;
+    padding: 2px 6px;
+    letter-spacing: .04em;
+  }
+  .live-card.is-live .lc-score {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  .live-card .lc-meta {
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .72rem;
+    color: var(--muted);
+  }
+  .live-card .lc-minute {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: .8rem;
+    color: #e11d48;
+  }
+  .live-empty {
+    text-align: center;
+    font-size: .8rem;
+    color: var(--muted);
+    padding: 12px 0;
+    line-height: 1.5;
+  }
+  .live-update-time {
+    font-size: .68rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  /* ── CONTEÚDO CENTRAL ── */
+  .center-content {
+    flex: 1;
+    min-width: 0;
+  }
+  .center-content .section { max-width: 860px; margin: 0 auto; }
+
+  /* ── BOTÃO SALVAR PEQUENO (TOPO) ── */
+  .btn-save-top {
+    padding: 9px 18px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .btn-save-top:hover { background: var(--green-mid); }
+  .btn-save-top:active { transform: scale(.97); }
+
+  /* ── ETAPA + SAVE ROW ── */
+  .etapa-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: nowrap;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .etapa-row .user-select-wrap {
+    max-width: 280px;
+    margin-bottom: 0;
+  }
+  .etapa-row .btn-save-top {
+    margin-left: auto;
+  }
+
+  @media (max-width: 1100px) {
+    .live-sidebar { display: none; }
+  }
   @media (max-width: 480px) {
     .match-body { flex-direction: column; gap: 10px; }
     .team-name { font-size: 1rem; }
     .score-inputs input[type=number] { width: 48px; font-size: 1.1rem; }
+    .etapa-row { max-width: 100%; }
   }
 </style>
 </head>
@@ -391,6 +709,10 @@
 <header>
   <h1>⚽ Bolão TI Aperam — Copa 2026</h1>
   <p>Faça seus palpites e suba no ranking!</p>
+  <button class="dark-toggle" onclick="toggleDark()" id="dark-btn" title="Alternar modo escuro">
+    <div class="toggle-track"><div class="toggle-thumb"></div></div>
+    <span id="dark-btn-label">🌙 Escuro</span>
+  </button>
 </header>
 
 <nav>
@@ -400,6 +722,18 @@
   <button onclick="showTab('tab-regras')">📜 Regras</button>
   <button onclick="showTab('tab-admin')">⚙️ Admin</button>
 </nav>
+
+<div class="page-wrapper">
+
+  <!-- SIDEBAR ESQUERDA: Jogos ao Vivo -->
+  <aside class="live-sidebar" id="live-sidebar-left">
+    <div class="live-sidebar-title"><span class="live-dot"></span> Ao Vivo</div>
+    <div id="live-left-content"><div class="live-empty">Carregando...</div></div>
+    <div class="live-update-time" id="live-update-time"></div>
+  </aside>
+
+  <!-- CONTEÚDO CENTRAL -->
+  <div class="center-content">
 
 <div id="tab-palpites" class="section active">
   <div class="sec-title">🎯 Dar Palpites</div>
@@ -433,15 +767,18 @@
       <button class="btn-logout" onclick="handleLogout()">Sair da Conta</button>
     </div>
     
-    <div class="user-select-wrap" style="max-width: 280px; margin-bottom: 20px;">
-      <label>📅 Selecione a Etapa da Copa:</label>
-      <select id="sel-etapa" onchange="renderMatches(); loadUserPalpites();">
-        <option value="grupos">Fase de Grupos</option>
-        <option value="oitavas">Oitavas de Final</option>
-        <option value="quartas">Quartas de Final</option>
-        <option value="semi">Semifinais</option>
-        <option value="final">Grande Final</option>
-      </select>
+    <div class="etapa-row">
+      <div class="user-select-wrap">
+        <label>📅 Selecione a Etapa da Copa:</label>
+        <select id="sel-etapa" onchange="renderMatches(); loadUserPalpites();">
+          <option value="grupos">Fase de Grupos</option>
+          <option value="oitavas">Oitavas de Final</option>
+          <option value="quartas">Quartas de Final</option>
+          <option value="semi">Semifinais</option>
+          <option value="final">Grande Final</option>
+        </select>
+      </div>
+      <button class="btn-save-top" onclick="savePalpites()" title="Salvar palpites">💾 Salvar</button>
     </div>
     
     <div id="matches-container"></div>
@@ -587,6 +924,16 @@
 </div>
 
 <div id="toast">✅ Palpites salvos!</div>
+
+  </div><!-- /center-content -->
+
+  <!-- SIDEBAR DIREITA: Próximos Jogos -->
+  <aside class="live-sidebar" id="live-sidebar-right">
+    <div class="live-sidebar-title">📅 Hoje &amp; Amanhã</div>
+    <div id="live-right-content"><div class="live-empty">Carregando...</div></div>
+  </aside>
+
+</div><!-- /page-wrapper -->
 
 <script>
 // ════════════════════════════════════════
@@ -831,13 +1178,57 @@ function generateMatchHTML(m, results) {
   const isDefinir = m.home === "A definir" || m.away === "A definir";
   const disabled = adminDone || timeLocked || isDefinir;
   
-  let chip = adminDone ? `<span class="chip chip-done">Encerrado</span>` :
-             timeLocked ? `<span class="chip chip-locked">Fechado/Em Jogo</span>` :
-             isDefinir ? `<span class="chip chip-locked">Aguardando</span>` :
-             `<span class="chip chip-soon">Aberto</span>`;
+  // Calcular status de tempo para urgência
+  const st = (!adminDone && !isDefinir) ? getMatchStatus(m) : null;
+  const isLive   = st && st.status === 'live';
+  const isSoon   = st && st.status === 'soon' && st.hoursLeft === 0; // menos de 1h
+  const isToday  = st && st.status === 'soon' && st.hoursLeft >= 1;  // 1-24h
+
+  let urgencyClass = '';
+  if (isLive)  urgencyClass = 'match-urgency';
+  else if (isSoon) urgencyClass = 'match-urgency';
+  else if (isToday && st.hoursLeft < 3) urgencyClass = 'match-soon-warn';
+
+  let chip;
+  if (adminDone)  chip = `<span class="chip chip-done">Encerrado</span>`;
+  else if (isLive) chip = `<span class="chip chip-live">⚡ Ao Vivo</span>`;
+  else if (timeLocked) chip = `<span class="chip chip-locked">Fechado/Em Jogo</span>`;
+  else if (isDefinir) chip = `<span class="chip chip-locked">Aguardando</span>`;
+  else chip = `<span class="chip chip-soon">Aberto</span>`;
+
+  // Bloco de countdown (só aparece se o jogo ainda não terminou e tem status de urgência)
+  let countdownHTML = '';
+  if (urgencyClass && !adminDone) {
+    if (isLive) {
+      const pct = Math.min(100, Math.round((st.minute / 90) * 100));
+      countdownHTML = `
+        <div class="countdown-bar"><div class="countdown-bar-fill" style="width:${pct}%"></div></div>
+        <div class="match-countdown">
+          <span class="cd-label">⚡ Em andamento</span>
+          <span class="cd-timer" id="cd-${m.id}">${st.minute}'</span>
+        </div>`;
+    } else {
+      // Ainda não começou — calcula segundos restantes
+      const parts = m.date.split('/'), tp = m.time.split(':');
+      const kickoff = new Date(parts[2], parts[1]-1, parts[0], parseInt(tp[0]), parseInt(tp[1]));
+      const secsLeft = Math.max(0, Math.floor((kickoff - new Date()) / 1000));
+      const totalSecs = (isSoon ? 3600 : st.hoursLeft * 3600); // janela de urgência
+      const pct = Math.max(0, Math.round((1 - secsLeft / totalSecs) * 100));
+      const h = Math.floor(secsLeft / 3600), mn = Math.floor((secsLeft % 3600) / 60), sc = secsLeft % 60;
+      const cdStr = h > 0
+        ? `${h}h ${mn.toString().padStart(2,'0')}m`
+        : `${mn.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`;
+      countdownHTML = `
+        <div class="countdown-bar"><div class="countdown-bar-fill" style="width:${pct}%"></div></div>
+        <div class="match-countdown">
+          <span class="cd-label">⏰ Começa em</span>
+          <span class="cd-timer" id="cd-${m.id}" data-kickoff="${kickoff.getTime()}">${cdStr}</span>
+        </div>`;
+    }
+  }
     
   return `
-  <div class="match-card" id="mc-${m.id}">
+  <div class="match-card ${urgencyClass}" id="mc-${m.id}">
     <div class="match-header"><span>${m.date} · ${m.time}</span>${chip}</div>
     <div class="match-body">
       <div class="team-name">${m.home}</div>
@@ -849,6 +1240,7 @@ function generateMatchHTML(m, results) {
       <div class="team-name">${m.away}</div>
       <div class="pts-display" id="pts-${m.id}">${adminDone ? `Real:<br><b>${r.h}–${r.a}</b>` : ''}</div>
     </div>
+    ${countdownHTML}
   </div>`;
 }
 
@@ -1092,6 +1484,201 @@ async function init() {
 }
 
 init();
+
+// ════════════════════════════════════════
+//  DARK MODE
+// ════════════════════════════════════════
+
+function toggleDark() {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('bolao_dark', isDark ? '1' : '0');
+  const lbl = document.getElementById('dark-btn-label');
+  if (lbl) lbl.textContent = isDark ? '☀️ Claro' : '🌙 Escuro';
+}
+
+// Aplica preferência salva ou segue o sistema
+(function initDark() {
+  const saved = localStorage.getItem('bolao_dark');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const active = saved !== null ? saved === '1' : prefersDark;
+  if (active) {
+    document.body.classList.add('dark');
+    const lbl = document.getElementById('dark-btn-label');
+    if (lbl) lbl.textContent = '☀️ Claro';
+  }
+})();
+
+// ════════════════════════════════════════
+//  JOGOS AO VIVO — COPA DO MUNDO 2026
+//  Usa a lista local MATCHES + horários para
+//  simular ao vivo. Integra com football-data.org
+//  via proxy de CORS quando disponível.
+// ════════════════════════════════════════
+
+const LIVE_REFRESH_INTERVAL = 60000; // 60 segundos
+
+function getMatchStatus(match) {
+  if (!match.date || !match.time || match.date === 'A definir') return null;
+  const parts = match.date.split('/');
+  const timeParts = match.time.split(':');
+  if (parts.length !== 3 || timeParts.length !== 2) return null;
+  const start = new Date(parts[2], parts[1]-1, parts[0], parseInt(timeParts[0]), parseInt(timeParts[1]));
+  const end   = new Date(start.getTime() + 110 * 60000); // ~110 min (90 + intervalo)
+  const now   = new Date();
+  if (now >= start && now <= end) {
+    const elapsed = Math.floor((now - start) / 60000);
+    const minute  = Math.min(elapsed, 90);
+    return { status: 'live', start, minute };
+  }
+  if (now < start) {
+    const diff = start - now;
+    const hours = Math.floor(diff / 3600000);
+    if (hours < 24) return { status: 'soon', start, hoursLeft: hours, minutesLeft: Math.floor((diff % 3600000) / 60000) };
+    if (hours < 48) return { status: 'tomorrow', start };
+  }
+  return { status: 'ended', start };
+}
+
+function formatMatchTime(dateStr, timeStr) {
+  const parts = dateStr.split('/');
+  return `${parts[0]}/${parts[1]} ${timeStr}`;
+}
+
+function buildLivePanels() {
+  const results = getResults();
+  const liveMatches   = [];
+  const soonMatches   = [];
+  const todayMatches  = [];
+
+  MATCHES.forEach(m => {
+    if (m.home === 'A definir') return;
+    const st = getMatchStatus(m);
+    if (!st) return;
+    if (st.status === 'live')     liveMatches.push({ m, st });
+    if (st.status === 'soon')     soonMatches.push({ m, st });
+    if (st.status === 'tomorrow') todayMatches.push({ m, st });
+  });
+
+  // ── SIDEBAR ESQUERDA: Ao Vivo ──
+  const leftEl = document.getElementById('live-left-content');
+  if (liveMatches.length === 0) {
+    leftEl.innerHTML = `<div class="live-empty">Nenhum jogo<br>ao vivo agora 🤷</div>`;
+  } else {
+    leftEl.innerHTML = liveMatches.map(({ m, st }) => {
+      const r = results[m.id];
+      const scoreH = (r && r.h !== null && r.h !== undefined) ? r.h : '–';
+      const scoreA = (r && r.a !== null && r.a !== undefined) ? r.a : '–';
+      const homeClean = m.home.replace('🇧🇷 ', '');
+      const awayClean = m.away.replace('🇧🇷 ', '');
+      return `<div class="live-card is-live">
+        <div class="lc-teams">
+          <div class="lc-team home">${homeClean}</div>
+          <div class="lc-score">${scoreH} – ${scoreA}</div>
+          <div class="lc-team away">${awayClean}</div>
+        </div>
+        <div class="lc-meta">
+          <span>${m.group}</span>
+          <span class="lc-minute">⏱ ${st.minute}'</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Atualizar timestamp
+  const timeEl = document.getElementById('live-update-time');
+  if (timeEl) {
+    const now = new Date();
+    timeEl.textContent = `Atualizado às ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  }
+
+  // ── SIDEBAR DIREITA: Em breve + Amanhã ──
+  const rightEl = document.getElementById('live-right-content');
+  const upcoming = [...soonMatches, ...todayMatches];
+
+  if (upcoming.length === 0) {
+    rightEl.innerHTML = `<div class="live-empty">Sem jogos<br>nas próximas 48h 📅</div>`;
+  } else {
+    rightEl.innerHTML = upcoming.slice(0, 6).map(({ m, st }) => {
+      const homeClean = m.home.replace('🇧🇷 ', '');
+      const awayClean = m.away.replace('🇧🇷 ', '');
+      let timeLabel;
+      if (st.status === 'soon') {
+        if (st.hoursLeft === 0) timeLabel = `em ${st.minutesLeft}min`;
+        else timeLabel = `em ${st.hoursLeft}h${st.minutesLeft > 0 ? st.minutesLeft+'min' : ''}`;
+      } else {
+        timeLabel = `Amanhã ${m.time}`;
+      }
+      return `<div class="live-card is-soon">
+        <div class="lc-teams">
+          <div class="lc-team home">${homeClean}</div>
+          <div class="lc-score" style="font-size:.85rem;background:#e0f2fe;color:#0369a1;">${m.time}</div>
+          <div class="lc-team away">${awayClean}</div>
+        </div>
+        <div class="lc-meta">
+          <span>${m.group}</span>
+          <span style="color:#0369a1;font-weight:700;font-size:.72rem;">${timeLabel}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function startLiveUpdates() {
+  buildLivePanels();
+  setInterval(buildLivePanels, LIVE_REFRESH_INTERVAL);
+
+  // Ticker de countdown — atualiza a cada segundo nos cards de palpite
+  setInterval(() => {
+    // Atualiza timers de "começa em" nos cards abertos
+    document.querySelectorAll('[id^="cd-"][data-kickoff]').forEach(el => {
+      const kickoff = parseInt(el.dataset.kickoff);
+      const secsLeft = Math.max(0, Math.floor((kickoff - Date.now()) / 1000));
+      const h  = Math.floor(secsLeft / 3600);
+      const mn = Math.floor((secsLeft % 3600) / 60);
+      const sc = secsLeft % 60;
+      if (secsLeft <= 0) {
+        el.textContent = '00:00';
+        // Jogo começou — pode re-renderizar para mostrar "Ao Vivo"
+        // (buildLivePanels vai pegar no próximo ciclo de 60s)
+      } else if (h > 0) {
+        el.textContent = `${h}h ${mn.toString().padStart(2,'0')}m`;
+      } else {
+        el.textContent = `${mn.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`;
+      }
+      // Atualiza a barra de progresso
+      const card = el.closest('.match-card');
+      if (card) {
+        const bar = card.querySelector('.countdown-bar-fill');
+        if (bar) {
+          const totalWindow = card.classList.contains('match-urgency') && h === 0 ? 3600 : 3 * 3600;
+          const pct = Math.max(0, Math.round((1 - secsLeft / totalWindow) * 100));
+          bar.style.width = pct + '%';
+        }
+      }
+    });
+
+    // Atualiza minutagem dos jogos ao vivo nos cards
+    document.querySelectorAll('[id^="cd-"]:not([data-kickoff])').forEach(el => {
+      const matchId = parseInt(el.id.replace('cd-', ''));
+      const match = MATCHES.find(m => m.id === matchId);
+      if (!match) return;
+      const st = getMatchStatus(match);
+      if (st && st.status === 'live') {
+        el.textContent = `${st.minute}'`;
+        const card = el.closest('.match-card');
+        if (card) {
+          const bar = card.querySelector('.countdown-bar-fill');
+          if (bar) bar.style.width = Math.min(100, Math.round((st.minute / 90) * 100)) + '%';
+        }
+      }
+    });
+  }, 1000);
+}
+
+// Inicia após os dados carregarem
+window.addEventListener('load', () => {
+  setTimeout(startLiveUpdates, 1800);
+});
 </script>
 </body>
 </html>
