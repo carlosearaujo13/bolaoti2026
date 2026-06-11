@@ -968,6 +968,61 @@
     color: var(--text);
     border-color: var(--border);
   }
+
+  /* ── CHAT WIDGET ── */
+  #chat-widget {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 320px; height: 400px;
+    background: var(--card); border: 1px solid var(--green);
+    border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: translateY(120%); transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+  }
+  #chat-widget.open { transform: translateY(0); }
+  
+  .chat-header {
+    background: var(--green); color: white; padding: 12px 16px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 1.2rem; font-weight: 700;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer;
+  }
+  .chat-body {
+    flex: 1; padding: 12px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 8px;
+    background: var(--surface);
+  }
+  .chat-msg { font-size: 0.85rem; line-height: 1.4; }
+  .chat-msg .time { font-size: 0.7rem; color: var(--muted); margin-right: 4px; }
+  .chat-msg .user { font-weight: 700; color: var(--green); margin-right: 4px; }
+  
+  .chat-input-area {
+    display: flex; padding: 10px; background: var(--card);
+    border-top: 1px solid var(--border);
+  }
+  .chat-input-area input {
+    flex: 1; padding: 8px 12px; border: 1px solid var(--border);
+    border-radius: 20px; font-size: 0.9rem; outline: none;
+  }
+  .chat-input-area input:focus { border-color: var(--green); }
+  
+  /* Botão flutuante para abrir o chat */
+  #chat-fab {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--green); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s; z-index: 999;
+  }
+  #chat-fab:hover { transform: scale(1.05); }
+
+  /* MODO ESCURO DO CHAT */
+  body.dark #chat-widget { border-color: var(--border); }
+  body.dark .chat-input-area input { background: #1a2a1d; color: var(--text); }
+  body.dark .chat-msg .user { color: var(--pts10); }
+
 </style>
 </head>
 <body>
@@ -1363,7 +1418,24 @@
     <div id="live-right-content"><div class="live-empty">Carregando...</div></div>
   </aside>
 
-</div><script>
+</div>
+
+<div id="chat-fab" onclick="toggleChat()">💬</div>
+
+<div id="chat-widget">
+  <div class="chat-header" onclick="toggleChat()">
+    <span>Resenha da Rodada</span>
+    <span>✕</span>
+  </div>
+  <div class="chat-body" id="chat-box">
+    <div style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:20px;">Carregando mensagens...</div>
+  </div>
+  <div class="chat-input-area">
+    <input type="text" id="chat-input" placeholder="Digite uma mensagem..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+  </div>
+</div>
+
+<script>
 // ════════════════════════════════════════
 //  CONFIGURAÇÃO
 // ════════════════════════════════════════
@@ -2644,6 +2716,93 @@ function downloadLogs() {
 window.addEventListener('load', () => {
   setTimeout(startLiveUpdates, 1800);
 });
+
+// ════════════════════════════════════════
+//  CHAT WIDGET
+// ════════════════════════════════════════
+let chatOpen = false;
+let chatInterval = null;
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const widget = document.getElementById('chat-widget');
+  const fab = document.getElementById('chat-fab');
+  
+  if (chatOpen) {
+    widget.classList.add('open');
+    fab.style.display = 'none';
+    loadChatMessages();
+    chatInterval = setInterval(loadChatMessages, 8000);
+  } else {
+    widget.classList.remove('open');
+    setTimeout(() => fab.style.display = 'flex', 300);
+    clearInterval(chatInterval);
+  }
+}
+
+async function loadChatMessages() {
+  const user = getLoggedUser();
+  if (!user) {
+    document.getElementById('chat-box').innerHTML = '<div style="text-align:center;color:var(--red-pts);font-size:.85rem;margin-top:20px;">Faça login para ver e usar o chat.</div>';
+    return;
+  }
+
+  try {
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getChat' }) });
+    let json = await res.json();
+    
+    if (json.status === 'success' && json.data) {
+      const box = document.getElementById('chat-box');
+      const isScrolledToBottom = box.scrollHeight - box.clientHeight <= box.scrollTop + 20;
+
+      box.innerHTML = json.data.map(m => `
+        <div class="chat-msg">
+          <span class="time">${m.time}</span>
+          <span class="user">${m.user}:</span>
+          <span class="text">${m.msg}</span>
+        </div>
+      `).join('') || '<div style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:20px;">Nenhuma mensagem ainda.</div>';
+
+      if (isScrolledToBottom) {
+        box.scrollTop = box.scrollHeight;
+      }
+    }
+  } catch (e) {
+    console.error("Erro ao carregar chat", e);
+  }
+}
+
+async function sendChatMessage() {
+  const user = getLoggedUser();
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  
+  if (!user) { showToast('⚠️ Identifique-se primeiro!'); return; }
+  if (!msg) return;
+
+  input.value = '';
+  
+  const box = document.getElementById('chat-box');
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  box.innerHTML += `
+    <div class="chat-msg" style="opacity: 0.6;">
+      <span class="time">${timeStr}</span>
+      <span class="user">${user}:</span>
+      <span class="text">${msg}</span>
+    </div>`;
+  box.scrollTop = box.scrollHeight;
+
+  try {
+    await fetch(API_URL, { 
+      method: 'POST', 
+      body: JSON.stringify({ action: 'sendChat', user: user, msg: msg }) 
+    });
+    loadChatMessages();
+  } catch(e) {
+    showToast('❌ Erro ao enviar mensagem.');
+  }
+}
 </script>
 </body>
 </html>
