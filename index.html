@@ -182,7 +182,7 @@
 
   .user-select-wrap { margin-bottom: 20px; }
   .user-select-wrap label { display: block; font-size: .85rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
-  select, input[type=text], input[type=password] {
+  select, input[type=text], input[type=password], input[type=email] {
     width: 100%; padding: 10px 12px;
     border: 1.5px solid var(--border);
     border-radius: 8px;
@@ -192,7 +192,7 @@
     outline: none;
     transition: border-color .2s;
   }
-  select:focus, input[type=text]:focus, input[type=password]:focus { border-color: var(--green); }
+  select:focus, input[type=text]:focus, input[type=password]:focus, input[type=email]:focus { border-color: var(--green); }
 
   .user-status-bar {
     display: flex; justify-content: space-between; align-items: center;
@@ -952,17 +952,6 @@
   }
   .btn-deny:hover { background: #b91c1c; }
 
-  input[type=email] {
-    width: 100%; padding: 10px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-size: .95rem;
-    background: #fff;
-    color: var(--text);
-    outline: none;
-    transition: border-color .2s;
-  }
-  input[type=email]:focus { border-color: var(--green); }
   body.dark input[type=email] {
     background: #1a2a1d;
     color: var(--text);
@@ -972,9 +961,9 @@
 </head>
 <body>
 
-<div id="loading-overlay" style="position:fixed; inset:0; background:rgba(255,255,255,0.9); z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:1.5rem; font-weight:700; color:var(--green);">
-  <div style="border: 4px solid var(--border); border-top: 4px solid var(--green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom:12px;"></div>
-  Sincronizando com o Banco de Dados...
+<div id="loading-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:1.5rem; font-weight:700; color:#ffffff; backdrop-filter: blur(4px);">
+  <div style="border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid #ffffff; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom:16px;"></div>
+  Aguarde, processando...
 </div>
 
 <header>
@@ -1016,7 +1005,7 @@
   <div id="auth-container" class="card" style="max-width: 420px; margin: 30px auto; display: block;">
     <div class="card-title">🔐 Identifique-se para palpitar</div>
     <div class="user-select-wrap">
-      <label>👤 Usuário ou E-mail</label>
+      <label>👤 Usuário ou Nome</label>
       <input type="text" id="login-user" placeholder="Ex: Nome ou Usuário">
     </div>
     <div class="user-select-wrap">
@@ -1368,8 +1357,7 @@
 //  CONFIGURAÇÃO
 // ════════════════════════════════════════
 
-const API_URL = "https://script.google.com/macros/s/AKfycbyaoglqxHcBBCNpXfX4TFw6-TA2__xYStSnviBRgvYc5QNrFH0sUtqFkp_lUyLDU-XR/exec"; 
-const ADMIN_PASSWORD = "aperam2026"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbzZ1jvxpiAhbKhPVzUzNp7yZspmkHI78a0eCIlwKaIaG64PN4mbaFXCqnVdmPmxlf-b/exec"; 
 
 // ════════════════════════════════════════
 //  PARTIDAS — FASE DE GRUPOS (fixas no código)
@@ -2159,13 +2147,42 @@ function renderRanking() {
 //  ADMIN
 // ════════════════════════════════════════
 
-function checkAdmin() {
-  if (document.getElementById('admin-pw').value === ADMIN_PASSWORD) {
-    document.getElementById('admin-panel').style.display = 'block';
-    document.getElementById('admin-login-card').style.display = 'none';
-    renderAdminMatches();
-    renderKOEditor();
-  } else { document.getElementById('admin-msg').textContent = '❌ Senha incorreta.'; }
+async function checkAdmin() {
+  const pass = document.getElementById('admin-pw').value;
+  const msg = document.getElementById('admin-msg');
+  
+  if (!pass) { 
+    msg.textContent = '⚠️ Digite a senha.'; 
+    return; 
+  }
+
+  // Aciona a tela de loading escurecida que trava tudo
+  showLoading(true);
+
+  try {
+    let res = await fetch(API_URL, { 
+      method: 'POST', 
+      body: JSON.stringify({ 
+        action: 'verifyAdmin', 
+        pass: pass 
+      }) 
+    });
+    
+    let json = await res.json();
+    
+    if (json.status === 'success') {
+      document.getElementById('admin-panel').style.display = 'block';
+      document.getElementById('admin-login-card').style.display = 'none';
+      renderAdminMatches();
+      renderKOEditor();
+    } else {
+      msg.textContent = '❌ ' + (json.msg || 'Senha incorreta.');
+    }
+  } catch (e) {
+    msg.textContent = '❌ Erro de conexão com o servidor.';
+  }
+  
+  showLoading(false);
 }
 
 function switchAdminTab(tab) {
