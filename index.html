@@ -73,7 +73,6 @@
   body.dark .admin-ko-card { background: #1a2a1d; border-color: var(--border); }
   body.dark .admin-ko-card input[type=text] { background: #111e13; }
 
-  /* --- CORREÇÃO DO FUNDO DOS INPUTS NO MODO ESCURO --- */
   body.dark .score-inputs input[type=number] {
     background: #1a2a1d;
     color: #4ade80;
@@ -83,7 +82,6 @@
     color: #ffffff;
   }
 
-  /* --- ESTATÍSTICAS DA GALERA --- */
   .stats-wrapper {
     padding: 8px 16px 14px;
     background: rgba(0,0,0,0.02);
@@ -103,7 +101,6 @@
   .stats-h { background: var(--pts10); transition: width 0.5s; }
   .stats-d { background: #94a3b8; transition: width 0.5s; }
   .stats-a { background: var(--pts5); transition: width 0.5s; }
-  /* --------------------------------------------------- */
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -798,7 +795,6 @@
     margin-left: auto;
   }
 
-  /* Indicador de rodada automática */
   .round-auto-badge {
     display: inline-flex;
     align-items: center;
@@ -1027,7 +1023,6 @@
   }
   .chat-input-area input:focus { border-color: var(--green); }
 
-  /* Botão flutuante para abrir o chat */
   #chat-fab {
     position: fixed; bottom: 24px; right: 24px;
     width: 56px; height: 56px; border-radius: 50%;
@@ -1039,7 +1034,6 @@
   }
   #chat-fab:hover { transform: scale(1.05); }
 
-  /* MODO ESCURO DO CHAT */
   body.dark #chat-widget { border-color: var(--border); }
   body.dark .chat-input-area input { background: #1a2a1d; color: var(--text); }
   body.dark .chat-msg .user { color: var(--pts10); }
@@ -1337,7 +1331,7 @@
         <div class="card-title">🗓️ Editar Confrontos do Mata-Mata</div>
         <p style="font-size:.85rem; color:var(--muted); margin-bottom:16px; line-height:1.5;">
           Defina os times, datas e horários dos confrontos conforme forem saindo. Os dados serão salvos na planilha e aparecerão automaticamente para todos os participantes na aba de Palpites.<br>
-          <b>Atenção:</b> Configure as colunas de Data e Hora na planilha como "Texto Simples" para evitar bugs.
+          <b>Atenção:</b> Configure as colunas de Data e Hora na planilha como "Texto Simples" para evitar bugs de conversão do Google.
         </p>
 
         <div style="display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; align-items:flex-end;">
@@ -1476,25 +1470,33 @@ function escapeHtml(s) {
   });
 }
 
-// Fallback de formatação caso a planilha mande data em ISO por engano
-function parseIsoGoogleDate(str) {
-  if (!str || str === "A definir" || !str.includes('T')) return str;
-  try {
-    let d = new Date(str);
-    let day = d.getDate().toString().padStart(2,'0');
-    let mo = (d.getMonth()+1).toString().padStart(2,'0');
-    return `${day}/${mo}/${d.getFullYear()}`;
-  } catch(e) { return str; }
+// FORMATADOR ROBUSTO PARA IMPEDIR QUE DATAS VIRAM UTC E MUDEM O DIA OU HORA (BUG DO GOOGLE SHEETS)
+function formatWeirdDate(val) {
+  if (!val || val === 'A definir') return val;
+  val = String(val);
+  // Se já tiver no formato DD/MM/YYYY
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) return val;
+  // Se vier no formato sopa de letras do Google com 'T'
+  if (val.includes('T')) {
+    const parts = val.split('T')[0].split('-');
+    if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`; 
+  }
+  return val;
 }
 
-function parseIsoGoogleTime(str) {
-  if (!str || str === "A definir" || !str.includes('T')) return str;
+function formatWeirdTime(val) {
+  if (!val || val === 'A definir') return val;
+  val = String(val);
+  // Se já tiver no formato HH:MM
+  if (/^\d{2}:\d{2}$/.test(val)) return val;
   try {
-    let d = new Date(str);
+    let d = new Date(val);
+    if (isNaN(d.getTime())) return val;
+    // Pega o horário da timezone local que converte o shift do Google
     let h = d.getHours().toString().padStart(2,'0');
     let m = d.getMinutes().toString().padStart(2,'0');
     return `${h}:${m}`;
-  } catch(e) { return str; }
+  } catch(e) { return val; }
 }
 
 let AUTH_TOKEN = null;
@@ -1513,7 +1515,7 @@ function handleSessionExpired() {
   setToken(null);
   setLoggedUser(null);
   checkAuth();
-  showToast("⚠️ Sessão expirada! Por favor, faça login novamente.");
+  showToast("⏳ Sessão expirada! Por favor, faça login novamente.");
 }
 
 // ════════════════════════════════════════
@@ -1634,9 +1636,8 @@ function rebuildMatches() {
       id:    tpl.id,
       phase: tpl.phase,
       slot:  tpl.slot,
-      // Passa pela formatação de segurança caso a planilha tenha enviado data zoada
-      date:  parseIsoGoogleDate(saved.date) || "A definir",
-      time:  parseIsoGoogleTime(saved.time) || "A definir",
+      date:  formatWeirdDate(saved.date) || "A definir",
+      time:  formatWeirdTime(saved.time) || "A definir",
       group: saved.label || tpl.label,
       home:  saved.home  || "A definir",
       away:  saved.away  || "A definir",
@@ -1718,8 +1719,8 @@ async function handleLogin() {
       showToast(`👋 Bem-vindo, ${json.userName}!`);
     } else {
       loginAttempts++;
-      msg.textContent = `❌ ${json.msg || 'Erro ao fazer login'}. Tentativa ${loginAttempts}/3.`;
-      logError(`Login falhou: ${json.msg}`, identifier, 'warn');
+      msg.textContent = `❌ ${json.msg || 'Erro ao fazer login'}. (Letras maiúsculas ou espaços?) Tentativa ${loginAttempts}/3.`;
+      logError(`Login falhou para [${identifier}]. Msg: ${json.msg}`, identifier, 'warn');
       checkLoginAttempts(identifier);
     }
   } catch(e) {
@@ -1839,8 +1840,12 @@ async function handleRegister() {
   showLoading(false);
 }
 
-function handleLogout() {
+async function handleLogout() {
   if (confirm("Sair da sua conta?")) {
+    const currentToken = getToken();
+    if (currentToken) {
+      fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'logout', token: currentToken }) }).catch(()=>{});
+    }
     setLoggedUser(null);
     setToken(null);
     checkAuth();
@@ -1895,23 +1900,92 @@ async function updateProfileName() {
 
   showLoading(true);
   try {
-    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateProfile', token: getToken(), field: 'name', value: newName, pass }) });
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateProfile', token: getToken(), user: getLoggedUser(), field: 'name', value: newName, pass }) });
     let json = await res.json();
     if (json.status === 'success') {
       if (json.token) setToken(json.token);
       await refreshData();
       setLoggedUser(newName);
       document.getElementById('display-logged-user').textContent = newName;
+      showToast('✅ Nome alterado com sucesso!');
       msgEl.textContent = '✅ Nome atualizado com sucesso!'; msgEl.className = 'profile-msg ok';
     } else {
       msgEl.textContent = '❌ ' + (json.msg || 'Erro ao atualizar.'); msgEl.className = 'profile-msg err';
+      logError(`Falha ao atualizar nome de ${user}: ${json.msg}`, user);
       if (json.msg && json.msg.toLowerCase().includes('sessão')) handleSessionExpired();
     }
-  } catch(e) { msgEl.textContent = '❌ Erro de conexão.'; msgEl.className = 'profile-msg err'; }
+  } catch(e) { 
+    msgEl.textContent = '❌ Erro de conexão.'; msgEl.className = 'profile-msg err';
+    logError(`Erro de rede ao atualizar nome de ${user}: ${e.message}`, user);
+  }
   showLoading(false);
 }
 
-// (As outras funções de update de email e senha seguem o mesmo fluxo)
+async function updateProfileEmail() {
+  const user = getLoggedUser();
+  const newEmail = document.getElementById('profile-new-email').value.trim();
+  const pass = document.getElementById('profile-email-pass').value;
+  const msgEl = document.getElementById('profile-email-msg');
+
+  if (!newEmail) { msgEl.textContent = '⚠️ Digite o novo e-mail.'; msgEl.className = 'profile-msg err'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { msgEl.textContent = '⚠️ E-mail inválido.'; msgEl.className = 'profile-msg err'; return; }
+  if (!pass) { msgEl.textContent = '⚠️ Confirme sua senha.'; msgEl.className = 'profile-msg err'; return; }
+
+  showLoading(true);
+  try {
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateProfile', token: getToken(), user: getLoggedUser(), field: 'email', value: newEmail, pass }) });
+    let json = await res.json();
+    if (json.status === 'success') {
+      await refreshData();
+      showToast('✅ Email alterado com sucesso!');
+      msgEl.textContent = '✅ E-mail atualizado!'; msgEl.className = 'profile-msg ok';
+      document.getElementById('profile-new-email').value = '';
+      document.getElementById('profile-email-pass').value = '';
+    } else {
+      msgEl.textContent = '❌ ' + (json.msg || 'Erro ao atualizar.'); msgEl.className = 'profile-msg err';
+      logError(`Falha ao atualizar email de ${user}: ${json.msg}`, user);
+      if (json.msg && json.msg.toLowerCase().includes('sessão')) handleSessionExpired();
+    }
+  } catch(e) {
+    msgEl.textContent = '❌ Erro de conexão.'; msgEl.className = 'profile-msg err';
+    logError(`Erro de rede ao atualizar email de ${user}: ${e.message}`, user);
+  }
+  showLoading(false);
+}
+
+async function updateProfilePassword() {
+  const user = getLoggedUser();
+  const oldPass = document.getElementById('profile-old-pass').value;
+  const newPass = document.getElementById('profile-new-pass').value;
+  const confirmPass = document.getElementById('profile-confirm-pass').value;
+  const msgEl = document.getElementById('profile-pass-msg');
+
+  if (!oldPass) { msgEl.textContent = '⚠️ Digite sua senha atual.'; msgEl.className = 'profile-msg err'; return; }
+  if (!newPass || newPass.length < 4) { msgEl.textContent = '⚠️ Nova senha deve ter ao menos 4 dígitos.'; msgEl.className = 'profile-msg err'; return; }
+  if (newPass !== confirmPass) { msgEl.textContent = '⚠️ As senhas não coincidem.'; msgEl.className = 'profile-msg err'; return; }
+
+  showLoading(true);
+  try {
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateProfile', token: getToken(), user: getLoggedUser(), field: 'pass', value: newPass, pass: oldPass }) });
+    let json = await res.json();
+    if (json.status === 'success') {
+      await refreshData();
+      showToast('✅ Senha alterada com sucesso!');
+      msgEl.textContent = '✅ Senha alterada com sucesso!'; msgEl.className = 'profile-msg ok';
+      document.getElementById('profile-old-pass').value = '';
+      document.getElementById('profile-new-pass').value = '';
+      document.getElementById('profile-confirm-pass').value = '';
+    } else {
+      msgEl.textContent = '❌ ' + (json.msg || 'Erro ao alterar senha.'); msgEl.className = 'profile-msg err';
+      logError(`Falha ao alterar senha de ${user}: ${json.msg}`, user);
+      if (json.msg && json.msg.toLowerCase().includes('sessão')) handleSessionExpired();
+    }
+  } catch(e) {
+    msgEl.textContent = '❌ Erro de conexão.'; msgEl.className = 'profile-msg err';
+    logError(`Erro de rede ao alterar senha de ${user}: ${e.message}`, user);
+  }
+  showLoading(false);
+}
 
 function updateUsersDropdown() {
   const sel = document.getElementById('sel-view-user'); if(!sel) return;
@@ -2055,7 +2129,6 @@ function generateMatchHTML(m, results) {
     }
   }
 
-  // Estatísticas liberadas para aparecer sempre que os times estiverem definidos
   let statsHTML = '';
   if (!isDefinir) {
     statsHTML = getMatchStatsHTML(m);
@@ -2177,17 +2250,23 @@ async function savePalpites() {
   if(guessesToSend.length === 0) { showToast('⚠️ Nenhum palpite preenchido (ou jogos fechados).'); return; }
   showLoading(true);
   try {
-    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'savePalpites', token: getToken(), guesses: guessesToSend }) });
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'savePalpites', token: getToken(), user: getLoggedUser(), guesses: guessesToSend }) });
     let json = await res.json();
-    if(json.status === 'success') { await refreshData(); renderRanking(); showToast('✅ Palpites salvos!'); }
-    else { 
+    if(json.status === 'success') { 
+      await refreshData(); 
+      renderRanking(); 
+      showToast('✅ Palpites salvos!'); 
+    } else { 
       showToast('❌ ' + (json.msg || 'Erro ao salvar palpites.')); 
-      // TRAVA DA SESSÃO INVÁLIDA: Derruba o usuário se o servidor recusar o Token
+      logError('Erro ao salvar palpites: ' + json.msg, user, 'error');
       if (json.msg && (json.msg.toLowerCase().includes('sessão') || json.msg.toLowerCase().includes('token'))) {
          setTimeout(handleSessionExpired, 1500);
       }
     }
-  } catch(e) { showToast('❌ Erro de conexão.'); }
+  } catch(e) { 
+    showToast('❌ Erro de conexão.'); 
+    logError('Erro de rede ao salvar palpites: ' + e.message, user, 'error');
+  }
   showLoading(false);
 }
 
@@ -2216,7 +2295,6 @@ function renderMyPalpites() {
     
     if (pts !== null) {
       total += pts;
-      // Checa os confetes (só pro dono do perfil e nas últimas 14h do jogo)
       if (pts === 10 && isOwnProfile) {
         if (m.date !== 'A definir' && m.time !== 'A definir' && !m.date.includes('T')) {
           const dParts = m.date.split('/');
@@ -2364,8 +2442,14 @@ async function saveResult(id) {
       if(getLoggedUser()) { renderMatches(); loadUserPalpites(); }
       if (document.getElementById('sel-view-user').value) renderMyPalpites();
       showToast(`✅ Resultado salvo!`);
-    } else { showToast('❌ ' + (json.msg || 'Erro ao salvar.')); }
-  } catch(e) { showToast('❌ Erro de rede.'); }
+    } else { 
+      showToast('❌ ' + (json.msg || 'Erro ao salvar.')); 
+      logError('Erro Admin ao salvar placar: ' + json.msg, 'admin', 'error');
+    }
+  } catch(e) { 
+    showToast('❌ Erro de rede.'); 
+    logError('Erro de rede Admin ao salvar placar: ' + e.message, 'admin', 'error');
+  }
   showLoading(false);
 }
 
@@ -2389,8 +2473,8 @@ function renderKOEditor() {
     const hasResult = resData && resData.h !== null && resData.h !== undefined;
 
     // Desfaz o ISO na hora de jogar pro form do admin caso o Planilha mande bugado
-    const displayDate = parseIsoGoogleDate(saved.date);
-    const displayTime = parseIsoGoogleTime(saved.time);
+    const displayDate = formatWeirdDate(saved.date);
+    const displayTime = formatWeirdTime(saved.time);
 
     html += `<div class="admin-ko-card">
       <div class="ko-match-title">
@@ -2451,8 +2535,14 @@ async function saveKOMatch(id) {
       renderAdminMatches();
       if(getLoggedUser()) { renderMatches(); loadUserPalpites(); }
       showToast(`✅ Confronto salvo! (ID ${id})`);
-    } else { showToast('❌ ' + (json.msg || 'Erro ao salvar confronto.')); }
-  } catch(e) { showToast('❌ Erro de rede.'); }
+    } else { 
+      showToast('❌ ' + (json.msg || 'Erro ao salvar confronto.')); 
+      logError('Erro Admin salvar mata-mata: ' + json.msg, 'admin', 'error');
+    }
+  } catch(e) { 
+    showToast('❌ Erro de rede.'); 
+    logError('Erro de rede Admin ao salvar mata-mata: ' + e.message, 'admin', 'error');
+  }
   showLoading(false);
 }
 
@@ -2508,7 +2598,6 @@ function toggleDark() {
 const LIVE_REFRESH_INTERVAL = 60000;
 
 function getMatchStatus(match) {
-  // A trava do '.includes(T)' bloqueia jogos com datas bugadas de quebrarem a conta
   if (!match.date || !match.time || match.date === 'A definir' || match.date.includes('T')) return null;
   const parts = match.date.split('/');
   const timeParts = match.time.split(':');
@@ -2527,20 +2616,18 @@ function getMatchStatus(match) {
     const diff = start - now;
     const hours = Math.floor(diff / 3600000);
     
-    // Matemática limpa para saber o que é "Amanhã" pelo Calendário
     const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const isTomorrow = start.getFullYear() === tomorrow.getFullYear() &&
                        start.getMonth() === tomorrow.getMonth() &&
                        start.getDate() === tomorrow.getDate();
 
-    // Se é hoje mesmo ou nas próximas 12 horas, é contagem regressiva total ("soon")
     if ((hours < 24 && start.getDate() === now.getDate()) || hours < 12) {
        return { status: 'soon', start, hoursLeft: hours, minutesLeft: Math.floor((diff % 3600000) / 60000) };
     }
     if (isTomorrow) {
        return { status: 'tomorrow', start };
     }
-    return null; // Oculta da sidebar jogos que estão longe demais
+    return null;
   }
   return { status: 'ended', start };
 }
@@ -2770,7 +2857,7 @@ window.addEventListener('load', () => {
 });
 
 // ════════════════════════════════════════
-//  CHAT WIDGET (COM TRAVA DE SESSÃO)
+//  CHAT WIDGET
 // ════════════════════════════════════════
 let chatOpen = false;
 let chatInterval = null;
@@ -2800,7 +2887,7 @@ async function loadChatMessages() {
   }
 
   try {
-    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getChat', token: getToken() }) });
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getChat', token: getToken(), user: getLoggedUser() }) });
     let json = await res.json();
 
     if (json.status === 'success' && json.data) {
@@ -2819,17 +2906,18 @@ async function loadChatMessages() {
         box.scrollTop = box.scrollHeight;
       }
     } else {
-      // O TEXTO "CARREGANDO MENSAGENS..." NÃO FICA MAIS TRAVADO AQUI
       const box = document.getElementById('chat-box');
       box.innerHTML = `<div style="text-align:center;color:var(--red-pts);font-size:.85rem;margin-top:20px;">❌ ${json.msg || 'Sessão inválida. Relogue para acessar o chat.'}</div>`;
-      
-      // TRAVA DA SESSÃO INVÁLIDA: Desloga usuário imediatamente
       if (json.msg && (json.msg.toLowerCase().includes('sessão') || json.msg.toLowerCase().includes('token'))) {
          handleSessionExpired();
       }
     }
   } catch (e) {
-    console.error("Erro ao carregar chat", e);
+    const box = document.getElementById('chat-box');
+    if (box && box.innerHTML.includes('Carregando')) {
+      box.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:20px;">Não foi possível carregar as mensagens.</div>`;
+    }
+    logError('Erro ao carregar chat: ' + e.message, user, 'warn');
   }
 }
 
@@ -2857,19 +2945,21 @@ async function sendChatMessage() {
   try {
     let res = await fetch(API_URL, {
       method: 'POST',
-      body: JSON.stringify({ action: 'sendChat', token: getToken(), msg: msg })
+      body: JSON.stringify({ action: 'sendChat', token: getToken(), user: getLoggedUser(), msg: msg })
     });
     let json = await res.json();
     if(json.status === 'success') {
       loadChatMessages();
     } else {
       showToast('❌ ' + (json.msg || 'Erro ao enviar.'));
+      logError('Erro ao enviar no chat: ' + json.msg, user, 'warn');
       if (json.msg && (json.msg.toLowerCase().includes('sessão') || json.msg.toLowerCase().includes('token'))) {
          handleSessionExpired();
       }
     }
   } catch(e) {
     showToast('❌ Erro ao enviar mensagem.');
+    logError('Erro de rede ao enviar no chat: ' + e.message, user, 'warn');
   }
 }
 </script>
