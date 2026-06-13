@@ -1924,7 +1924,7 @@ async function updateProfileName() {
     } else {
       msgEl.textContent = '❌ ' + (json.msg || 'Erro ao atualizar.'); msgEl.className = 'profile-msg err';
       logError(`Falha ao atualizar nome de ${user}: ${json.msg}`, user);
-      if (json.msg && json.msg.toLowerCase().includes('sessão')) handleSessionExpired();
+      if (json.msg && json.msg.toLowerCase().includes('sessão')) setTimeout(handleSessionExpired, 1500);
     }
   } catch(e) { 
     msgEl.textContent = '❌ Erro de conexão.'; msgEl.className = 'profile-msg err';
@@ -1956,7 +1956,7 @@ async function updateProfileEmail() {
     } else {
       msgEl.textContent = '❌ ' + (json.msg || 'Erro ao atualizar.'); msgEl.className = 'profile-msg err';
       logError(`Falha ao atualizar email de ${user}: ${json.msg}`, user);
-      if (json.msg && json.msg.toLowerCase().includes('sessão')) handleSessionExpired();
+      if (json.msg && json.msg.toLowerCase().includes('sessão')) setTimeout(handleSessionExpired, 1500);
     }
   } catch(e) {
     msgEl.textContent = '❌ Erro de conexão.'; msgEl.className = 'profile-msg err';
@@ -1990,7 +1990,7 @@ async function updateProfilePassword() {
     } else {
       msgEl.textContent = '❌ ' + (json.msg || 'Erro ao alterar senha.'); msgEl.className = 'profile-msg err';
       logError(`Falha ao alterar senha de ${user}: ${json.msg}`, user);
-      if (json.msg && json.msg.toLowerCase().includes('sessão')) handleSessionExpired();
+      if (json.msg && json.msg.toLowerCase().includes('sessão')) setTimeout(handleSessionExpired, 1500);
     }
   } catch(e) {
     msgEl.textContent = '❌ Erro de conexão.'; msgEl.className = 'profile-msg err';
@@ -2254,20 +2254,48 @@ async function savePalpites() {
     const r = results[m.id];
     if (r && r.h !== null && r.h !== undefined) return;
     if (isMatchLocked(m.date, m.time)) return;
-    const phEl = document.getElementById(`ph-${m.id}`), paEl = document.getElementById(`pa-${m.id}`);
+    const phEl = document.getElementById(`ph-${m.id}`);
+    const paEl = document.getElementById(`pa-${m.id}`);
     if (!phEl || !paEl) return;
-    if (phEl.value !== '' && paEl.value !== '') guessesToSend.push({ id: m.id, h: parseInt(phEl.value), a: parseInt(paEl.value) });
+    
+    const valH = phEl.value.trim();
+    const valA = paEl.value.trim();
+    if (valH !== '' && valA !== '') {
+      guessesToSend.push({ id: m.id, h: parseInt(valH, 10), a: parseInt(valA, 10) });
+    }
   });
 
-  if(guessesToSend.length === 0) { showToast('⚠️ Nenhum palpite preenchido (ou jogos fechados).'); return; }
+  if(guessesToSend.length === 0) { showToast('⚠️ Nenhum palpite preenchido ou alterado.'); return; }
   showLoading(true);
   try {
-    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'savePalpites', token: getToken(), user: getLoggedUser(), guesses: guessesToSend }) });
+    let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'savePalpites', token: getToken(), user: user, guesses: guessesToSend }) });
     let json = await res.json();
+    
     if(json.status === 'success') { 
+      // TRAVA DE SEGURANÇA: Espera o Google processar a escrita na planilha antes de buscar a versão nova
+      await new Promise(resolve => setTimeout(resolve, 800));
       await refreshData(); 
+      
+      // CONFIRMAÇÃO DE LEITURA (Double-Check): Confere se o banco devolveu o que a gente mandou
+      const currentData = getData();
+      let confirmados = true;
+      guessesToSend.forEach(g => {
+         const saved = currentData[`${user}__${g.id}`];
+         if (!saved || saved.h !== g.h || saved.a !== g.a) {
+            confirmados = false;
+         }
+      });
+
+      if (confirmados) {
+         showToast('✅ Palpites salvos!'); 
+      } else {
+         showToast('⚠️ Falha de sincronização. Alguns palpites não foram salvos.');
+         logError('Falso positivo evitado no Frontend. Dados não persistiram no Sheets.', user, 'error');
+      }
+
       renderRanking(); 
-      showToast('✅ Palpites salvos!'); 
+      // ATUALIZA A TELA: Reverte visualmente qualquer palpite que o banco tenha falhado em salvar
+      loadUserPalpites();
     } else { 
       showToast('❌ ' + (json.msg || 'Erro ao salvar palpites.')); 
       logError('Erro ao salvar palpites: ' + json.msg, user, 'error');
@@ -2450,6 +2478,7 @@ async function saveResult(id) {
     let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveResult', token: ADMIN_TOKEN, id: id, h: parseInt(h), a: parseInt(a) }) });
     let json = await res.json();
     if(json.status === 'success') {
+      await new Promise(r => setTimeout(r, 800));
       await refreshData(); renderAdminMatches(); renderRanking();
       if(getLoggedUser()) { renderMatches(); loadUserPalpites(); }
       if (document.getElementById('sel-view-user').value) renderMyPalpites();
@@ -2484,7 +2513,6 @@ function renderKOEditor() {
     const resData = getResults()[tpl.id];
     const hasResult = resData && resData.h !== null && resData.h !== undefined;
 
-    // Desfaz o ISO na hora de jogar pro form do admin caso o Planilha mande bugado
     const displayDate = formatWeirdDate(saved.date);
     const displayTime = formatWeirdTime(saved.time);
 
@@ -2542,6 +2570,7 @@ async function saveKOMatch(id) {
     })});
     let json = await res.json();
     if(json.status === 'success') {
+      await new Promise(r => setTimeout(r, 800));
       await refreshData();
       renderKOEditor();
       renderAdminMatches();
